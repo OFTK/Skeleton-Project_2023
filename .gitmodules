@@ -1,0 +1,3 @@
+[submodule "02 IoT Device/serverless-iot"]
+	path = 02 IoT Device/serverless-iot
+	url = git@github.com:OFTK/serverless-iot.git

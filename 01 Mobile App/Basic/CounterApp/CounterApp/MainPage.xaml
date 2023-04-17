@@ -11,15 +11,15 @@
         <Label Text="Counter App" HorizontalOptions="Center" FontSize="Large" FontAttributes="Bold" Margin="20"/>
 
         <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
-            <Label Text="Counter 1: " FontSize="Medium" TextColor="DarkGray" VerticalOptions="Center"/>
+            <Label Text="Counter 1: " FontSize="Medium" TextColor="black" VerticalOptions="Center"/>
             <Label Text="{Binding Counter1}" FontSize="Medium" FontAttributes="Bold" VerticalOptions="Center" WidthRequest="50" HorizontalTextAlignment="Center"/>
-            <Button Text="Increment" BackgroundColor="Blue" TextColor="White" Command="{Binding IncrementCounterCommand}" CommandParameter="0" VerticalOptions="Center" Padding="0"/>
+            <Button Text="Increment" BackgroundColor="cyan" TextColor="black" Command="{Binding IncrementCounterCommand}" CommandParameter="0" VerticalOptions="Center" Padding="0"/>
         </StackLayout>
 
         <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
-            <Label Text="Counter 2: " FontSize="Medium" TextColor="DarkGray" VerticalOptions="Center"/>
+            <Label Text="Counter 2: " FontSize="Medium" TextColor="Black" VerticalOptions="Center"/>
             <Label Text="{Binding Counter2}" FontSize="Medium" FontAttributes="Bold" VerticalOptions="Center" WidthRequest="50" HorizontalTextAlignment="Center"/>
-            <Button Text="Increment" BackgroundColor="Blue" TextColor="White" Command="{Binding IncrementCounterCommand}" CommandParameter="1" VerticalOptions="Center" Padding="0"/>
+            <Button Text="Increment" BackgroundColor="cyan" TextColor="black" Command="{Binding IncrementCounterCommand}" CommandParameter="1" VerticalOptions="Center" Padding="0"/>
         </StackLayout>
 
     </StackLayout>

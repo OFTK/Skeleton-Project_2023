@@ -7,6 +7,10 @@ To be able to develop mobile applications using Xamarin, you first need to insta
 
 https://docs.microsoft.com/en-us/xamarin/get-started/installation/windows
 
+Also, you need to install .NET SDK from the following link:
+[link to .NET SDK 5.0, for Visual Studio 2019](https://download.visualstudio.microsoft.com/download/pr/14ccbee3-e812-4068-af47-1631444310d1/3b8da657b99d28f1ae754294c9a8f426/dotnet-sdk-5.0.408-win-x64.exe)
+
+
 ## Go though the interactive C# tutorial
 To develop in Xamarin, you’ll need to learn C#. Refresh your memory using the following online interactive tutorial.
 
