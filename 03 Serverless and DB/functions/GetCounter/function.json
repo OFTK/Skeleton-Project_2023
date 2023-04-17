@@ -14,7 +14,7 @@
     {
       "name": "counterTable",
       "type": "table",
-      "tableName": "countertable",
+      "tableName": "counterTable",
       "connection": "AzureWebJobsStorage",
       "direction": "in"
     },

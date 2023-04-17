@@ -2,8 +2,8 @@
   "IsEncrypted": false,
   "Values": {
     "FUNCTIONS_WORKER_RUNTIME": "python",
-    "AzureWebJobsStorage": "Endpoint=https://skeletonsignalr.service.signalr.net;AccessKey=y5TdU+vohJLQEUqrC+IPN0yGkcpbt5/S8Oh+DfeB/H8=;Version=1.0;",
-    "AzureSignalRConnectionString": "Endpoint=https://skeletonsignalr.service.signalr.net;AccessKey=y5TdU+vohJLQEUqrC+IPN0yGkcpbt5/S8Oh+DfeB/H8=;Version=1.0;"
+    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=nonstorageaccount;AccountKey=t1sT4EnnJZ0bUoNzIbp2fVRLVNQdce+2gG+swt20vwzbp8KtbfTIMLjik/smQ8m7oOJP2TKk3Hlw+ASt6qD92Q==;EndpointSuffix=core.windows.net",
+    "AzureSignalRConnectionString": "Endpoint=https://nonskeletonsignalr.service.signalr.net;AccessKey=1w85563wZMbz8dQulvej3gE730OOztLyd4DM/zEJ7To=;Version=1.0;"
   }
 }
 
