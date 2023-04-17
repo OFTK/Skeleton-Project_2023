@@ -12,6 +12,13 @@
       ]
     },
     {
+      "type": "signalR",
+      "name": "signalRMessages",
+      "hubName": "mySignalRHub",
+      "connection": "AzureSignalRConnectionString",
+      "direction": "out"
+    },
+    {
       "type": "http",
       "direction": "out",
       "name": "$return"

@@ -3,7 +3,7 @@
   "Values": {
     "FUNCTIONS_WORKER_RUNTIME": "python",
     "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=skeletondevstorage;AccountKey=SlBSx4D7jMGF+vat2sYBuRy/tLLE9TVTf5fP2O1Pc+zJIxtfOxGnFyE970mcCq9kBVrn9U5rzjJd+AStklg7BA==;EndpointSuffix=core.windows.net",
-    "AzureSignalRConnectionString": "Endpoint=https://nonskeletonsignalr.service.signalr.net;AccessKey=1w85563wZMbz8dQulvej3gE730OOztLyd4DM/zEJ7To=;Version=1.0;"
+    "AzureSignalRConnectionString": "Endpoint=https://counterdemosignalr.service.signalr.net;AccessKey=TkcgeQIEvXm6DAjRhkWMozNM9c76z8nV8pbFAs2KfQY=;Version=1.0;"
   }
 }
 

@@ -7,24 +7,31 @@ import logging
 
 
 def main(req: func.HttpRequest,
-         signalRMessages: func.Out[str]
-        #  testEventHub: func.Out[str] #TODO(TEST EvenHUB)
          ) -> func.HttpResponse:
     connection_string = os.getenv("AzureWebJobsStorage")
-    try:
-        with TableClient.from_connection_string(connection_string, table_name="countertable") as table:
-            entity = table.get_entity("counters", "counter_0")
-            new_counter_value = entity["value"] + 1
-            entity["value"] = new_counter_value
-            table.update_entity(entity)
-            signalRMessages.set(json.dumps({
-                'target': "newMessage",
-                # Array of arguments
-                'arguments': [f"The counter current Value is {new_counter_value}"]
-            }))
-            # # TODO(TEST EventHub)
-            # testEventHub.set(f"The counter current Value is {new_counter_value}")
-            return func.HttpResponse(f"New counter Value {new_counter_value}", status_code=200)
-    except Exception as e:
-        logging.error(e)
-        return func.HttpResponse(f"Something went wrong", status_code=500)
+    new_counter = req.params.get('counter')
+    if not new_counter:
+        try:
+            req_body = req.get_json()
+        except ValueError:
+            pass
+        else:
+            new_counter = req_body.get('counter')
+
+    if new_counter:
+        try:
+            with TableClient.from_connection_string(connection_string, table_name="counterTable") as table:
+                entity = table.get_entity("counters", "counter_0")
+                entity["value"] = new_counter
+                table.update_entity(entity)
+                return func.HttpResponse(f"New counter Value {new_counter}", status_code=200)
+        except Exception as e:
+            logging.error(e)
+            return func.HttpResponse(f"Something went wrong", status_code=500)
+
+    else:
+        return func.HttpResponse(
+             "please send new counter value",
+             status_code=200
+        )
+
