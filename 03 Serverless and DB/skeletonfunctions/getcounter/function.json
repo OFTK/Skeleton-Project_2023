@@ -2,7 +2,7 @@
   "scriptFile": "__init__.py",
   "bindings": [
     {
-      "authLevel": "anonymous",
+      "authLevel": "Anonymous",
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
@@ -10,6 +10,13 @@
         "get",
         "post"
       ]
+    },
+    {
+      "name": "counterTable",
+      "type": "table",
+      "tableName": "countertable",
+      "connection": "AzureWebJobsStorage",
+      "direction": "in"
     },
     {
       "type": "http",
