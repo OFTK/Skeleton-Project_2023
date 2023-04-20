@@ -24,3 +24,6 @@ https://github.com/Azure/azure-iot-sdk-c/tree/master/iothub_client/samples
 After you make sure that the device actually receives the messages and handles them appropriately, it is time to deploy your Web App to azure.
 You can follow this interactive tutorial to have better understanding on how to deploy a web app to the Azure App Service.
 https://docs.microsoft.com/en-us/learn/modules/host-a-web-app-with-azure-app-service/
+
+### configure function app CORS policy
+when deploying you webapp you must add the webb-app's domain to the CORS policy of the function app, the webapp and the functions wouldn't be able to communicate.
