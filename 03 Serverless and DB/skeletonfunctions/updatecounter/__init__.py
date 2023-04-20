@@ -2,6 +2,7 @@ import azure.functions as func
 from azure.data.tables import TableClient
 
 import os 
+import json
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     connection_string = os.getenv("AzureWebJobsStorage")
@@ -12,7 +13,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         else: new_counter = req_body.get('counter')
 
     if not new_counter:
-        return func.HttpResponse("counter request param must be added", status_code=200)
+        return func.HttpResponse(json.dumps({'message':"counter request param must be added"}), status_code=200)
     else:
         try:
             with TableClient.from_connection_string(connection_string, table_name="countertable") as table:
@@ -20,7 +21,11 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 counter_value = entity["value"]
                 entity["value"] = new_counter
                 table.update_entity(entity)
-                return func.HttpResponse(f"Previous counter Value was {counter_value}, and now is {new_counter}", status_code=200)
+                return func.HttpResponse(
+                    json.dumps({
+                        'prev-counter':counter_value,
+                        'current-counter':new_counter
+                    }), status_code=200)
         except:
             return func.HttpResponse(f"Something went wrong", status_code=500)
 
