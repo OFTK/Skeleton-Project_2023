@@ -18,7 +18,8 @@
     {
       "type": "signalRConnectionInfo",
       "name": "connectionInfo",
-      "hubName": "serverless",
+      "hubName": "CounterUpdate",
+      "userID": "SomeUser",
       "connectionStringSetting": "AzureSignalRConnectionString",
       "direction": "in"
     }

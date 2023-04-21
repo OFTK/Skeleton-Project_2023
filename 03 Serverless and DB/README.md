@@ -23,6 +23,8 @@ https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-your-fir
 
 We will create 3 different azure functions. Make sure that after you test those functions, you publish them on your Azure account.
 
+MAKE SURE TO DEPLOY SETTINGS AFTER DEPLOYING FUNCTIONS. 
+
 ### MessageReceiver
 Create a new azure function to receive messages from your custom Event Hub.
 Choose the appropriate trigger and make sure that pressing the button on your IoT device from the previous assignment actually triggers the function.
