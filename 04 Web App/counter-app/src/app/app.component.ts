@@ -19,10 +19,18 @@ interface Counter {
   styleUrls: ["./app.component.less"]
 })
 export class AppComponent {
-  private readonly httpOptions = { headers: new HttpHeaders({ "Content-Type": "application/json" }) };
-  private readonly negotiateUrl = "http://localhost:7071/api/negotiate";
-  private readonly getCounterUrl = "http://localhost:7071/api/get-counter";
-  private readonly updateCounterUrl = "http://localhost:7071/api/update-counter";
+  private readonly httpOptions = { headers: new HttpHeaders({
+     "Content-Type": "application/json" ,
+     "Access-Control-Allow-Origin": "*",
+     "Access-Control-Allow-Methods": "POST, GET",
+     "Access-Control-Allow-Headers": "Content-Type"
+    }) };
+  private readonly negotiateUrl = "https://skeletonfunctionapp.azurewebsites.net/api/negotiate";
+  private readonly getCounterUrl = "https://skeletonfunctionapp.azurewebsites.net/api/getcounter";
+  private readonly updateCounterUrl = "https://skeletonfunctionapp.azurewebsites.net/api/updatecounter";
+  // private readonly negotiateUrl = "http://localhost:7071/api/negotiate";
+  // private readonly getCounterUrl = "http://localhost:7071/api/getcounter";
+  // private readonly updateCounterUrl = "http://localhost:7071/api/updatecounter";
 
   private readonly counterId = 1;
 
@@ -48,14 +56,14 @@ export class AppComponent {
         hub.start();
       });
 
-    this.http.get<Counter>(this.getCounterUrl + "/" + this.counterId).subscribe(cloudCounter => {
+    this.http.get<Counter>(this.getCounterUrl).subscribe(cloudCounter => {
       console.log(cloudCounter);
-      this.counter = cloudCounter.count;
+      this.counter = +cloudCounter.count;
     });
   }
 
   public increaseCounter(): void {
-    const body = { Id: this.counterId, Count: this.counter };
+    const body = { Id: this.counterId, counter: this.counter +=1 };
 
     this.http
       .post(this.updateCounterUrl, body, this.httpOptions)
