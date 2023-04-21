@@ -4,7 +4,11 @@
     "FUNCTIONS_WORKER_RUNTIME": "python",
     "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=skeletonwebjobsstorage;AccountKey=mruuYxVNkKXUmXQnSZXiE+duyQd5Ez6I7MS88Jf0LjSmGsFNvm9LwGAy/lLFWTZ3HojulpK+MlHV+AStZqL4aw==;EndpointSuffix=core.windows.net",
     "EventHubConnectionString": "Endpoint=sb://non-skeletondev.servicebus.windows.net/;SharedAccessKeyName=function_app_listener;SharedAccessKey=bYFaHbgLNDDbwAW3WHFXFZO+Vk12vZXKL+AEhFPOeUw=;EntityPath=skeletoneventhub",
-    "AzureSignalRConnectionString": "Endpoint=https://skeletonsignalr1.service.signalr.net;AccessKey=NIHnCete1iaNZVJDLenUX7eTiI5TXhfoH5raE/XZDnA=;Version=1.0;"
+    "AzureSignalRConnectionString": "Endpoint=https://skeletonsignalr1.service.signalr.net;AccessKey=NIHnCete1iaNZVJDLenUX7eTiI5TXhfoH5raE/XZDnA=;Version=1.0;",
+    "NONSkeletonDev_function_app_listener_EVENTHUB": "Endpoint=sb://non-skeletondev.servicebus.windows.net/;SharedAccessKeyName=function_app_listener;SharedAccessKey=bYFaHbgLNDDbwAW3WHFXFZO+Vk12vZXKL+AEhFPOeUw=;EntityPath=skeletoneventhub",
+    "AzureWebJobs.getcounter.Disabled": "true",
+    "AzureWebJobs.negotiate.Disabled": "true",
+    "AzureWebJobs.updatecounter.Disabled": "true"
   },
   "Host": {
     "CORS": "*"
