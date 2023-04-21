@@ -45,7 +45,11 @@ export class AppComponent {
       .post<SignalRConnection>(this.negotiateUrl, JSON.stringify(negotiateBody), this.httpOptions)
       .pipe(
         map(connectionDetails =>
-          new signalR.HubConnectionBuilder().withUrl(`${connectionDetails.url}`, { accessTokenFactory: () => connectionDetails.accessToken }).build()
+          new signalR.HubConnectionBuilder().
+          withUrl(
+            `${connectionDetails.url}`, 
+            { accessTokenFactory: () => connectionDetails.accessToken }
+          ).build()
         )
       )
       .subscribe(hub => {

@@ -9,16 +9,16 @@
     </ContentPage.BindingContext>
 
     <StackLayout>
-        <Label Text="Counter App" HorizontalOptions="Center" FontSize="Large" FontAttributes="Bold" Margin="20"/>
+        <Label Text="Counter App" HorizontalOptions="Center" FontSize="Large" FontAttributes="Bold" Margin="20" TextColor="DarkSlateGray"/>
 
         <ListView ItemsSource="{Binding Counters}" SeparatorColor="Transparent">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
                         <StackLayout Orientation="Horizontal" HorizontalOptions="Center" Margin="5">
-                            <Label Text="{Binding Id, StringFormat='Counter {0}: '}" FontSize="Medium" TextColor="DarkGray" VerticalOptions="Center"/>
-                            <Label Text="{Binding Counter}" FontSize="Medium" FontAttributes="Bold" VerticalOptions="Center" WidthRequest="50" HorizontalTextAlignment="Center"/>
-                            <Button Text="Increment" BackgroundColor="Blue" TextColor="White" Command="{Binding IncrementCounterCommand}" VerticalOptions="Center" Padding="0"/>
+                            <Label Text="{Binding Id, StringFormat='Counter {0}: '}" FontSize="Large" TextColor="DarkSlateGray" VerticalOptions="Center"/>
+                            <Label Text="{Binding Counter}" FontSize="Medium" FontAttributes="Bold" TextColor="DarkSlateGray" VerticalOptions="Center" WidthRequest="50" HorizontalTextAlignment="Center"/>
+                            <Button Text="Increment" BackgroundColor="DarkSlateGray" TextColor="white" Command="{Binding IncrementCounterCommand}" VerticalOptions="Center" Padding="0"/>
                         </StackLayout>
                     </ViewCell>
                 </DataTemplate>
