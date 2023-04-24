@@ -9,11 +9,6 @@
       "connection": "NONSkeletonDev_function_app_listener_EVENTHUB",
       "cardinality": "many",
       "consumerGroup": "$Default"
-    },
-    {
-      "type": "http",
-      "direction": "out",
-      "name": "$return"
     }
   ]
 }
