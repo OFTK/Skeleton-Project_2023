@@ -28,6 +28,7 @@ export class AppComponent {
   private readonly negotiateUrl = "https://skeletonfunctionapp.azurewebsites.net/api/negotiate";
   private readonly getCounterUrl = "https://skeletonfunctionapp.azurewebsites.net/api/getcounter";
   private readonly updateCounterUrl = "https://skeletonfunctionapp.azurewebsites.net/api/updatecounter";
+  private readonly sendc2dmsgUrl = "https://skeletonfunctionapp.azurewebsites.net/api/sendc2dmsg";
   // private readonly negotiateUrl = "http://localhost:7071/api/negotiate";
   // private readonly getCounterUrl = "http://localhost:7071/api/getcounter";
   // private readonly updateCounterUrl = "http://localhost:7071/api/updatecounter";
@@ -66,7 +67,7 @@ export class AppComponent {
     const body = { Id: this.counterId, counter: this.counter +=1 };
 
     this.http
-      .post(this.updateCounterUrl, body, this.httpOptions)
+      .post(this.sendc2dmsgUrl, body, this.httpOptions)
       .toPromise()
       .catch(e => console.log(e));
   }
