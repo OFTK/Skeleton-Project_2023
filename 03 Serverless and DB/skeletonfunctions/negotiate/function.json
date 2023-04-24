@@ -18,8 +18,7 @@
     {
       "type": "signalRConnectionInfo",
       "name": "connectionInfo",
-      "hubName": "CounterUpdate",
-      "userID": "SomeUser",
+      "hubName": "skeletonsignalr1",
       "connectionStringSetting": "AzureSignalRConnectionString",
       "direction": "in"
     }

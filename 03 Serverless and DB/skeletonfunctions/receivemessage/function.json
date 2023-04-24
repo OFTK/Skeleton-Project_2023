@@ -9,6 +9,13 @@
       "connection": "NONSkeletonDev_function_app_listener_EVENTHUB",
       "cardinality": "many",
       "consumerGroup": "$Default"
+    },
+    {
+      "type": "signalR",
+      "name": "signalRMessages",
+      "hubName": "skeletonsignalr1",
+      "connectionStringSetting": "AzureSignalRConnectionString",
+      "direction": "out"
     }
   ]
 }

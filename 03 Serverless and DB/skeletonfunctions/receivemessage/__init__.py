@@ -7,7 +7,7 @@ from typing import List
 from azure.data.tables import TableClient
 
 
-def main(events: List[func.EventHubEvent]):
+def main(events: List[func.EventHubEvent], outMessage: func.Out[str]):
 
     connection_string = os.getenv("AzureWebJobsStorage")
 
@@ -19,6 +19,11 @@ def main(events: List[func.EventHubEvent]):
                 new_counter = int(counter_value) + 1
                 entity["value"] = new_counter
                 table.update_entity(entity)
+
+                outMessage.set(json.dumps({
+                    'target': 'counterUpdate',
+                    'arguments': [f"{new_counter}"]
+                }))
+
         except Exception as e:
             logging.error(f"Failed to update table entity with error: {e}")
-        
