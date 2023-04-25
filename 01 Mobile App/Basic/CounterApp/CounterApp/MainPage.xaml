@@ -18,8 +18,8 @@
 
         <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
             <Label Text="Counter 2: " FontSize="Medium" TextColor="Black" VerticalOptions="Center"/>
-            <Label Text="{Binding Counter2}" FontSize="Medium" FontAttributes="Bold" VerticalOptions="Center" WidthRequest="50" HorizontalTextAlignment="Center"/>
-            <Button Text="Increment" BackgroundColor="cyan" TextColor="black" Command="{Binding IncrementCounterCommand}" CommandParameter="1" VerticalOptions="Center" Padding="0"/>
+            <Label Text="{Binding Counter1}" FontSize="Medium" FontAttributes="Bold" VerticalOptions="Center" WidthRequest="50" HorizontalTextAlignment="Center"/>
+            <Button Text="Increment" BackgroundColor="cyan" TextColor="black" Command="{Binding IncrementCounterCommand}" CommandParameter="0" VerticalOptions="Center" Padding="0"/>
         </StackLayout>
 
     </StackLayout>
