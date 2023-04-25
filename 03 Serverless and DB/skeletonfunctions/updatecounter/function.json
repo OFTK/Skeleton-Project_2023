@@ -12,6 +12,13 @@
       ]
     },
     {
+      "type": "signalR",
+      "name": "signalRMessages",
+      "hubName": "skeletonsignalr1",
+      "connectionStringSetting": "AzureSignalRConnectionString",
+      "direction": "out"
+    },
+    {
       "type": "http",
       "direction": "out",
       "name": "$return"

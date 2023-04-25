@@ -5,7 +5,7 @@ import os
 import json
 import logging
 
-def main(req: func.HttpRequest) -> func.HttpResponse:
+def main(req: func.HttpRequest, signalRMessages: func.Out[str]) -> func.HttpResponse:
     connection_string = os.getenv("AzureWebJobsStorage")
     new_counter = req.params.get('counter')
     if not new_counter:
@@ -21,11 +21,20 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(json.dumps({'message':"counter request param must be added"}), status_code=200)
     else:
         try:
+            # access storage account, read previous counter, and update with the new one.
             with TableClient.from_connection_string(connection_string, table_name="countertable") as table:
                 entity = table.get_entity("counters", "counter_0")
                 counter_value = entity["value"]
                 entity["value"] = new_counter
                 table.update_entity(entity)
+
+                # broadcast a SignalR message 
+                signalRMessages.set(json.dumps({
+                    'target': 'counterUpdate',
+                    'arguments': [f"{new_counter}"]
+                }))
+
+                # return the previous and new counter
                 return func.HttpResponse(
                     json.dumps({
                         'prev-counter':counter_value,

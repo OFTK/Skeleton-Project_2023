@@ -7,7 +7,7 @@ from typing import List
 from azure.data.tables import TableClient
 
 
-def main(events: List[func.EventHubEvent], outMessage: func.Out[str]):
+def main(events: List[func.EventHubEvent], signalRMessages: func.Out[str]):
 
     connection_string = os.getenv("AzureWebJobsStorage")
 
@@ -20,7 +20,7 @@ def main(events: List[func.EventHubEvent], outMessage: func.Out[str]):
                 entity["value"] = new_counter
                 table.update_entity(entity)
 
-                outMessage.set(json.dumps({
+                signalRMessages.set(json.dumps({
                     'target': 'counterUpdate',
                     'arguments': [f"{new_counter}"]
                 }))
