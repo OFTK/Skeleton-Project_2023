@@ -1,9 +1,0 @@
-{
-  "IsEncrypted": false,
-  "Values": {
-    "FUNCTIONS_WORKER_RUNTIME": "python",
-    "AzureWebJobsStorage": "Endpoint=https://skeletonsignalr.service.signalr.net;AccessKey=y5TdU+vohJLQEUqrC+IPN0yGkcpbt5/S8Oh+DfeB/H8=;Version=1.0;",
-    "AzureSignalRConnectionString": "Endpoint=https://skeletonsignalr.service.signalr.net;AccessKey=y5TdU+vohJLQEUqrC+IPN0yGkcpbt5/S8Oh+DfeB/H8=;Version=1.0;"
-  }
-}
-
