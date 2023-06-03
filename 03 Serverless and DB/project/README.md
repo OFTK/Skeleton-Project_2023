@@ -20,9 +20,9 @@ for every function there is a simple python client in the test folder
 no requirements for the header, by the body needs to contain a json of the following structure:
 ```json
 {
-    'family': '<FAMILY NAME>',
-    'babyname': '<BABY NAME>',
-    'babyid': '<BABY ID>'
+    "family": "<FAMILY NAME>",
+    "babyname": "<BABY NAME>",
+    "babyid": "<BABY ID>"
 }
 ```
 
@@ -30,10 +30,10 @@ no requirements for the header, by the body needs to contain a json of the follo
 no requirements for the header, by the body needs to contain a json of the following structure:
 ```json
 {
-    'family': '<FAMILY NAME>',
-    'babyname': '<BABY NAME>',
-    'longtitude': '<LONGTITUDE OF CARETAKER'S LOCATION>',
-    'latitude': '<LONGTITUDE OF CARETAKER'S LOCATION>'
+    "family": "<FAMILY NAME>",
+    "babyname": "<BABY NAME>",
+    "longtitude": "<float: LONGTITUDE OF CARETAKER>",
+    "latitude": "<float: LATITUDE OF CARETAKER'S LOCATION>"
 }
 ```
 
