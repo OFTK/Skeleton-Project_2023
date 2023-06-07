@@ -16,7 +16,7 @@ DateTime is datetime of format iso 8601. To create that in python i used:
 ```python
 from datetime import datetime
 
-current_time_in_iso_format = datetime.now().isoformat() # isoformat() returns a strin of the desired format
+current_time_in_iso_format = datetime.now().isoformat() # isoformat() returns a string of the desired format
 ```
 
 
