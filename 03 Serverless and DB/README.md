@@ -1,34 +1,44 @@
 # Serverless and DB
 
 ## Storage account
+
 ### general information
-The URL to the table endpoint is: https://skeletonwebjobsstorage.table.core.windows.net/
+
+The URL to the table endpoint is: <https://skeletonwebjobsstorage.table.core.windows.net/>
 
 ### storage design
-* partition key <string>:   FAMILY NAME (for now it will be "*family*")
-* row key <string>:         BABY NAME
-* babyid <string>:          device ID
-* lastupdate <DateTime>:    time of the last status.
-* latitude <double>:        the latitude
-* longtitude <double>:      the longtitude
+
+| column name   | type      | description |
+| ---           | ---       | --- |
+| PartitionKey  | string    | FAMILY NAME (for now it will be "*family*") |
+| RowKey        | string    | the name eof the baby |
+| babyid        | string    | device ID |
+| lastupdate    | DateTime  | time of the last status. |
+| latitude      | double    | the latitude |
+| longtitude    | double    | the longtitude |
 
 There is also a timeStamp, its the creation time of the DB entity, and i couldn't manage to modify it.
 
 DateTime is datetime of format iso 8601. To create that in python i used:
+
 ```python
 from datetime import datetime
 
 current_time_in_iso_format = datetime.now().isoformat() # isoformat() returns a string of the desired format
 ```
 
+#### example
 
-#### example:
 ![Alt text](./db_example.jpg?raw=true "sample from the DB")
 
-## function API
+### function API
+
 for every function there is a simple python client in the test folder
-### addbaby
+
+#### addbaby
+
 no requirements for the header, by the body needs to contain a json of the following structure:
+
 ```json
 {
     "family": "<FAMILY NAME>",
@@ -37,8 +47,11 @@ no requirements for the header, by the body needs to contain a json of the follo
 }
 ```
 
-### udpatebabystatus
+#### udpatebabystatus
+
+POST request
 no requirements for the header, by the body needs to contain a json of the following structure:
+
 ```json
 {
     "family": "<FAMILY NAME>",
@@ -48,4 +61,30 @@ no requirements for the header, by the body needs to contain a json of the follo
 }
 ```
 
-Press the button on your IoT device. Make sure that the counter in your mobile app is incremented.
+#### getfamilystatus
+
+GET request
+one header parameter which is: ```family=[FAMILY NAME]``` e.g.: <http://localhost:7071/api/getfamilystatus?family=cohen>
+
+response is a json with the following structure:
+
+```json
+[
+    {
+        "family": "family",
+        "babyname": "nimrod",
+        "babyid": "abcdef",
+        "lastupdate": "2020-06-03T18:37:20.028312",
+        "latitude": 38.12435,
+        "longtitude": 37.12345
+    }, 
+    {
+        "family": "family",
+        "babyname": "nitzan",
+        "babyid": "abcde",
+        "lastupdate": "2023-06-03T18:39:10.074640",
+        "latitude": 38.12435,
+        "longtitude": 37.12345
+    }
+]
+```
