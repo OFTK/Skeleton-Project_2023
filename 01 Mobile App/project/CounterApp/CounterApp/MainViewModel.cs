@@ -24,8 +24,8 @@ namespace CounterApp
 
         // connection and display
         public HubConnection connection;
-        // private static readonly string baseUrl = "https://skeletonfunctionapp.azurewebsites.net";
-        private static readonly string baseUrl = "http://10.0.2.2:7071"; // this is the address to connect to the host
+        private static readonly string baseUrl = "https://skeletonfunctionapp.azurewebsites.net";
+        //private static readonly string baseUrl = "http://10.0.2.2:7071"; // this is the address to connect to the host
         private static readonly string getFamilyStatusUrl = baseUrl + "/api/getfamilystatus";
         public HttpClient client;
 
