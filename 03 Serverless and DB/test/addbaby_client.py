@@ -15,7 +15,7 @@ def send_addbaby_request(family: str, babyname: str, babyid: str, url: str):
 def main():
     localurl_base = "http://localhost:7071/api/"
     remoteurl_base = "" #TODO
-    send_addbaby_request("family", "ofek", "asdasas", localurl_base+"addbaby")
+    send_addbaby_request("family", "sivan", "abcdefg", localurl_base+"addbaby")
 
 if __name__ == '__main__':
     main()

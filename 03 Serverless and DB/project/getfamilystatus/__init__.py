@@ -34,24 +34,35 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             # put the status in a nice json format
             baby_status_list = []
             for entity in entities:
-                logging.info(f"got the last status of {entity['RowKey']} {entity['PartitionKey']} from {entity['lastupdate']}")
-                baby_status_list.append({
-                    'family': entity['PartitionKey'],
-                    'babyname': entity['RowKey'],
-                    'babyid': entity['babyid'],
-                    'lastupdate': entity['lastupdate'],
-                    'latitude': entity['latitude'],
-                    'longtitude': entity['longtitude']
-                })
+                try:
+                    logging.info(f"got the last status of {entity['RowKey']} {entity['PartitionKey']} from {entity['lastupdate']}")
+                    baby_status_list.append({
+                        'babyname': entity['RowKey'],
+                        'babyid': entity['babyid'],
+                        'lastupdate': entity['lastupdate'],
+                        'latitude': entity['latitude'],
+                        'longtitude': entity['longtitude']
+                    })
+                except:
+                    logging.info(f"got the last status of {entity['RowKey']} {entity['PartitionKey']}")
+                    baby_status_list.append({
+                        'babyname': entity['RowKey'],
+                        'babyid': entity['babyid'],
+                        'lastupdate': None,
+                        'latitude': None,
+                        'longtitude': None
+                    })
+
             
+            response = json.dumps({
+                "family": f"{family}",
+                "status": baby_status_list
+            })
             # loggin the response for debug purposes
-            logging.info(json.dumps(baby_status_list))
+            logging.info(response)
             
             # return the status 
-            return func.HttpResponse(
-                json.dumps(baby_status_list),
-                status_code=200
-            )
+            return func.HttpResponse(response, status_code=200)
 
     # in case of internal server error
     except Exception as e:

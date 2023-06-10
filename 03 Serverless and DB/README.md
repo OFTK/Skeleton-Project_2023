@@ -69,22 +69,32 @@ one header parameter which is: ```family=[FAMILY NAME]``` e.g.: <http://localhos
 response is a json with the following structure:
 
 ```json
-[
-    {
-        "family": "family",
-        "babyname": "nimrod",
-        "babyid": "abcdef",
-        "lastupdate": "2020-06-03T18:37:20.028312",
-        "latitude": 38.12435,
-        "longtitude": 37.12345
-    }, 
-    {
-        "family": "family",
-        "babyname": "nitzan",
-        "babyid": "abcde",
-        "lastupdate": "2023-06-03T18:39:10.074640",
-        "latitude": 38.12435,
-        "longtitude": 37.12345
-    }
-]
+{
+    "family": "family",
+    "status": [
+        {
+            "babyname": "nimrod",
+            "babyid": "abcdef",
+            "lastupdate": "2020-06-03T18:37:20.028312",
+            "latitude": 38.12435,
+            "longtitude": 37.12345
+        },
+        {
+            "babyname": "nitzan",
+            "babyid": "abcde",
+            "lastupdate": "2023-06-03T18:39:10.074640",
+            "latitude": 38.12435,
+            "longtitude": 37.12345
+        },
+        {
+            "babyname": "ofek",
+            "babyid": "asdasas",
+            "lastupdate": null,
+            "latitude": null,
+            "longtitude": null
+        }
+    ]
+}
 ```
+
+The null fields in sivan's last update is in case the baby was added, but an update was never sent.
