@@ -6,14 +6,7 @@
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
-      "methods": ["post"]
-    },
-    {
-      "type": "signalR",
-      "name": "signalRMessages",
-      "hubName": "skeletonsignalr1",
-      "connectionStringSetting": "AzureSignalRConnectionString",
-      "direction": "out"
+      "methods": ["get"]
     },
     {
       "type": "http",

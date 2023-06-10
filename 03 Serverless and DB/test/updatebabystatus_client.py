@@ -18,4 +18,5 @@ def main():
     remoteurl_base = "" #TODO
     update_baby_status("family", "ofek", 37.12345, 38.12435, localurl_base+"updatebabystatus")
 
-main()
+if __name__ == '__main__':
+    main()

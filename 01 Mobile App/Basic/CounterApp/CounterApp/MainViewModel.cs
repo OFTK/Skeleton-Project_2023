@@ -17,7 +17,6 @@ namespace CounterApp
     {
         public HubConnection connection;
         private readonly string baseUrl = "https://skeletonfunctionapp.azurewebsites.net";
-        private readonly string negotiateUrl = "https://skeletonfunctionapp.azurewebsites.net/api/negotiate";
         private readonly string getCounterUrl = "https://skeletonfunctionapp.azurewebsites.net/api/getcounter";
         private readonly string updateCounterUrl = "https://skeletonfunctionapp.azurewebsites.net/api/updatecounter";
         public HttpClient client;

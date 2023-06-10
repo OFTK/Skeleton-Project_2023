@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:CounterApp"
+             x:Class="CounterApp.MainPage"
+             Title="Tinoki">
+    <ContentPage.BindingContext>
+        <local:MainViewModel/>
+    </ContentPage.BindingContext>
+
+
+    <StackLayout>
+        <Label Text="I LOVE MY TINOKI" HorizontalOptions="Center" FontSize="Title" FontAttributes="Bold" Margin="20"/>
+
+        <ListView ItemsSource="{Binding FamilyStatusDisplay.status}" SeparatorColor="DarkGray">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextCell Text="{Binding babyname, StringFormat='{0}:'}" TextColor="DarkSlateGray" Detail="{Binding lastupdate, StringFormat='last seen on {0}'}"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+    </StackLayout>
+
+</ContentPage>
