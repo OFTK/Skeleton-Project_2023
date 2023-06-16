@@ -1,0 +1,18 @@
+{
+  "scriptFile": "__init__.py",
+  "bindings": [
+    {
+      "type": "signalR",
+      "name": "signalRMessages",
+      "hubName": "skeletonsignalr1",
+      "connectionStringSetting": "AzureSignalRConnectionString",
+      "direction": "out"
+    },
+    {
+      "name": "mytimer",
+      "type": "timerTrigger",
+      "direction": "in",
+      "schedule": "0 */2 * * * *"
+    }
+  ]
+}
