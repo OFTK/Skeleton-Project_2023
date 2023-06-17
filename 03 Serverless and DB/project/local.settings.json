@@ -11,6 +11,7 @@
     "AzureWebJobs.updatecounter.Disabled": "false"
   },
   "Host": {
+    "LocalHttpPort": 7071,
     "CORS": "*"
   }
 }
