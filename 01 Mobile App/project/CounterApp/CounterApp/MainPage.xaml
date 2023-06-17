@@ -20,6 +20,7 @@
             </ListView.ItemTemplate>
         </ListView>
 
+        <Label Text="{Binding DisplayMessage, StringFormat='{0}'}" TextColor="Black" FontSize="Small"/>
     </StackLayout>
 
 </ContentPage>

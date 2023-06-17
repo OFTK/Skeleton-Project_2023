@@ -13,6 +13,12 @@ using System.Text.Json;
 using System.Net.Http.Json;
 using Newtonsoft.Json;
 using System.Web;
+using Plugin.BLE;
+using Plugin.BLE.Abstractions;
+using Plugin.BLE.Abstractions.Contracts;
+using Xamarin.Essentials;
+using static Xamarin.Essentials.Permissions;
+using XamarinEssentials = Xamarin.Essentials;
 
 namespace CounterApp
 {
@@ -24,9 +30,11 @@ namespace CounterApp
 
         // connection and display
         public HubConnection connection;
-        private static readonly string baseUrl = "https://skeletonfunctionapp.azurewebsites.net";
+        private static readonly string baseUrl          = "https://skeletonfunctionapp.azurewebsites.net";
+
         //private static readonly string baseUrl = "http://10.0.2.2:7071"; // this is the address to connect to the host
         private static readonly string getFamilyStatusUrl = baseUrl + "/api/getfamilystatus";
+
         public HttpClient client;
 
         // attributs to display baby status
@@ -102,20 +110,16 @@ namespace CounterApp
 
         // update nearby baby status to server
         //////////////////////////////////////
-        private void UpdateBabyStatus(string babyname)
-        {
-            // build HTTP post request
-
-            // send HTTP post request with nearby baby status
-        }
 
         private void UpdateThread()
         {
             while (true)
             {
-                // for each neaby baby send status to server
-
-                Thread.Sleep(60000);
+                var scanner = new BLEScanner();
+                var result = scanner.BLEScan("71933006-db61-4c41-bfaa-d374279efb65").Result;
+                if (result._BabyTemp != null)
+                    DisplayMessage = "Temperature: " + result._BabyTemp.ToString() + "\nHumidity: " + result._BabyHumd.ToString() + "\n, Time: " + result._BabyLastSeenTime.ToString();
+                Thread.Sleep(1000);
             }
         }
 
@@ -150,9 +154,10 @@ namespace CounterApp
             FamilyStatusDisplay = new FamilyStatus();
             Thread update_family_status_thread = new Thread(StatusThread){};
             update_family_status_thread.Start();
+            Thread update_baby_status_thread = new Thread(UpdateThread) { };
+            update_baby_status_thread.Start();
             client.Dispose();
         }
-
 
         public event PropertyChangedEventHandler PropertyChanged;
         private bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
