@@ -25,14 +25,7 @@ namespace CounterApp
         private readonly List<IDevice> _gattDevices = new List<IDevice>();      // Empty list to store BLE devices that can be detected by the Bluetooth adapter
 
 
-        public class BabyStatus
-        {
-            public float? _BabyTemp = null;
-            public float? _BabyHumd = null;
-            public DateTime? _BabyLastSeenTime = null;
-        }
-
-        public async Task<BabyStatus> BLEScan(string ble_uuid)
+        public async Task<MainViewModel.BabyStatus> BLEScan(string ble_uuid)
         {
             // initialize bluetooth adapter
             if (!_bluetoothAdapter.IsScanning)                                                             // Make sure that the Bluetooth adapter is scanning for devices
@@ -41,7 +34,7 @@ namespace CounterApp
             }
 
             // initialize status object (that we would return eventually)
-            var status = new BabyStatus();
+            var status = new MainViewModel.BabyStatus();
 
             // scan all devices around
             foreach (IDevice device in _bluetoothAdapter.ConnectedDevices)                                // Make sure BLE devices are added to the _gattDevices list

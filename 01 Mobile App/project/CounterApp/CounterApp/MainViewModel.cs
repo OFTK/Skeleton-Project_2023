@@ -19,6 +19,8 @@ using Plugin.BLE.Abstractions.Contracts;
 using Xamarin.Essentials;
 using static Xamarin.Essentials.Permissions;
 using XamarinEssentials = Xamarin.Essentials;
+using System.Net.Mime;
+using System.Text;
 
 namespace CounterApp
 {
@@ -34,6 +36,7 @@ namespace CounterApp
 
         //private static readonly string baseUrl = "http://10.0.2.2:7071"; // this is the address to connect to the host
         private static readonly string getFamilyStatusUrl = baseUrl + "/api/getfamilystatus";
+        private static readonly string updateBabyStatusUrl = baseUrl + "/api/updatebabystatus";
 
         public HttpClient client;
 
@@ -54,6 +57,26 @@ namespace CounterApp
             public double? longtitude { get; set; }
         }
 
+        
+        public class StatusUpdate
+        {
+            public string family { get; set; }
+            public string babyname { get; set; }
+            public string longtitude { get; set; }
+            public string latitude { get; set; }
+        }
+
+
+        // TODO: use only one status type - this requires to change the API with the server...
+        public class BabyStatus
+        {
+            public float? _BabyTemp = null;
+            public float? _BabyHumd = null;
+            public DateTime? _BabyLastSeenTime = null;
+        }
+
+
+
         private FamilyStatus _familystatus;
         public FamilyStatus FamilyStatusDisplay
         {
@@ -67,6 +90,13 @@ namespace CounterApp
         {
             get => _displayMessage; 
             set => SetProperty(ref _displayMessage, value);
+        }
+
+        private string _displayMessage2;
+        public string DisplayMessage2
+        {
+            get => _displayMessage2;
+            set => SetProperty(ref _displayMessage2, value);
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -111,14 +141,41 @@ namespace CounterApp
         // update nearby baby status to server
         //////////////////////////////////////
 
-        private void UpdateThread()
+        private void UpdateServer(BabyStatus baby, Status curr_baby_status)
+        {
+            // put status from existing types in the type the server expects
+            StatusUpdate babyupdate = new StatusUpdate();
+            babyupdate.babyname = curr_baby_status.babyname;
+            babyupdate.family = "family";
+            babyupdate.longtitude = 32.3.ToString();
+            babyupdate.latitude = 32.3.ToString();
+
+            // send http request
+            HttpClient PostClient = new HttpClient();
+            HttpResponseMessage resp = PostClient.PostAsync(
+                updateBabyStatusUrl,
+                // serialize babyupdate
+                new StringContent(
+                    JsonConvert.SerializeObject(babyupdate), Encoding.UTF8, "application/json")
+                ).Result;
+
+        }
+
+        public void UpdateThread()
         {
             while (true)
             {
                 var scanner = new BLEScanner();
-                var result = scanner.BLEScan("71933006-db61-4c41-bfaa-d374279efb65").Result;
-                if (result._BabyTemp != null)
-                    DisplayMessage = "Temperature: " + result._BabyTemp.ToString() + "\nHumidity: " + result._BabyHumd.ToString() + "\n, Time: " + result._BabyLastSeenTime.ToString();
+                for (int i = 0; i < FamilyStatusDisplay.status.Count; i++)
+                {
+                    Status baby = FamilyStatusDisplay.status[i];
+                    BabyStatus result = scanner.BLEScan(baby.babyid).Result;
+                    if (result._BabyTemp != null)
+                    {
+                        DisplayMessage = "Temperature: " + result._BabyTemp.ToString() + "\nHumidity: " + result._BabyHumd.ToString() + "\n, Time: " + result._BabyLastSeenTime.ToString();
+                        UpdateServer(result, baby);
+                    }
+                }
                 Thread.Sleep(1000);
             }
         }
@@ -152,6 +209,7 @@ namespace CounterApp
             connection = new HubConnectionBuilder().WithUrl(new Uri(baseUrl + "/api")).Build();
             Task signalr_connection_task = Task.Run(async () => await ConnectToSignalr());
             FamilyStatusDisplay = new FamilyStatus();
+            GetFamilyStatus();
             Thread update_family_status_thread = new Thread(StatusThread){};
             update_family_status_thread.Start();
             Thread update_baby_status_thread = new Thread(UpdateThread) { };
