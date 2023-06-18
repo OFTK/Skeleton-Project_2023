@@ -13,6 +13,14 @@ using System.Text.Json;
 using System.Net.Http.Json;
 using Newtonsoft.Json;
 using System.Web;
+using Plugin.BLE;
+using Plugin.BLE.Abstractions;
+using Plugin.BLE.Abstractions.Contracts;
+using Xamarin.Essentials;
+using static Xamarin.Essentials.Permissions;
+using XamarinEssentials = Xamarin.Essentials;
+using System.Net.Mime;
+using System.Text;
 
 namespace CounterApp
 {
@@ -24,9 +32,12 @@ namespace CounterApp
 
         // connection and display
         public HubConnection connection;
-        private static readonly string baseUrl = "https://skeletonfunctionapp.azurewebsites.net";
+        private static readonly string baseUrl          = "https://skeletonfunctionapp.azurewebsites.net";
+
         //private static readonly string baseUrl = "http://10.0.2.2:7071"; // this is the address to connect to the host
         private static readonly string getFamilyStatusUrl = baseUrl + "/api/getfamilystatus";
+        private static readonly string updateBabyStatusUrl = baseUrl + "/api/updatebabystatus";
+
         public HttpClient client;
 
         // attributs to display baby status
@@ -46,6 +57,26 @@ namespace CounterApp
             public double? longtitude { get; set; }
         }
 
+        
+        public class StatusUpdate
+        {
+            public string family { get; set; }
+            public string babyname { get; set; }
+            public string longtitude { get; set; }
+            public string latitude { get; set; }
+        }
+
+
+        // TODO: use only one status type - this requires to change the API with the server...
+        public class BabyStatus
+        {
+            public float? _BabyTemp = null;
+            public float? _BabyHumd = null;
+            public DateTime? _BabyLastSeenTime = null;
+        }
+
+
+
         private FamilyStatus _familystatus;
         public FamilyStatus FamilyStatusDisplay
         {
@@ -59,6 +90,13 @@ namespace CounterApp
         {
             get => _displayMessage; 
             set => SetProperty(ref _displayMessage, value);
+        }
+
+        private string _displayMessage2;
+        public string DisplayMessage2
+        {
+            get => _displayMessage2;
+            set => SetProperty(ref _displayMessage2, value);
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -102,20 +140,43 @@ namespace CounterApp
 
         // update nearby baby status to server
         //////////////////////////////////////
-        private void UpdateBabyStatus(string babyname)
-        {
-            // build HTTP post request
 
-            // send HTTP post request with nearby baby status
+        private void UpdateServer(BabyStatus baby, Status curr_baby_status)
+        {
+            // put status from existing types in the type the server expects
+            StatusUpdate babyupdate = new StatusUpdate();
+            babyupdate.babyname = curr_baby_status.babyname;
+            babyupdate.family = "family";
+            babyupdate.longtitude = 32.3.ToString();
+            babyupdate.latitude = 32.3.ToString();
+
+            // send http request
+            HttpClient PostClient = new HttpClient();
+            HttpResponseMessage resp = PostClient.PostAsync(
+                updateBabyStatusUrl,
+                // serialize babyupdate
+                new StringContent(
+                    JsonConvert.SerializeObject(babyupdate), Encoding.UTF8, "application/json")
+                ).Result;
+
         }
 
-        private void UpdateThread()
+        public void UpdateThread()
         {
             while (true)
             {
-                // for each neaby baby send status to server
-
-                Thread.Sleep(60000);
+                var scanner = new BLEScanner();
+                for (int i = 0; i < FamilyStatusDisplay.status.Count; i++)
+                {
+                    Status baby = FamilyStatusDisplay.status[i];
+                    BabyStatus result = scanner.BLEScan(baby.babyid).Result;
+                    if (result._BabyTemp != null)
+                    {
+                        DisplayMessage = "Temperature: " + result._BabyTemp.ToString() + "\nHumidity: " + result._BabyHumd.ToString() + "\n, Time: " + result._BabyLastSeenTime.ToString();
+                        UpdateServer(result, baby);
+                    }
+                }
+                Thread.Sleep(1000);
             }
         }
 
@@ -148,11 +209,13 @@ namespace CounterApp
             connection = new HubConnectionBuilder().WithUrl(new Uri(baseUrl + "/api")).Build();
             Task signalr_connection_task = Task.Run(async () => await ConnectToSignalr());
             FamilyStatusDisplay = new FamilyStatus();
+            GetFamilyStatus();
             Thread update_family_status_thread = new Thread(StatusThread){};
             update_family_status_thread.Start();
+            Thread update_baby_status_thread = new Thread(UpdateThread) { };
+            update_baby_status_thread.Start();
             client.Dispose();
         }
-
 
         public event PropertyChangedEventHandler PropertyChanged;
         private bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)

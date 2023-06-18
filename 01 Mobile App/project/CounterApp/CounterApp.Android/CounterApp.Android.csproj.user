@@ -4,6 +4,7 @@
     <SelectedDevice>nexus_one_-_api_28</SelectedDevice>
     <DefaultDevice>nexus_one_-_api_28</DefaultDevice>
     <AndroidDesignerPreferredTheme>Theme.DeviceDefault.NoActionBar.Fullscreen</AndroidDesignerPreferredTheme>
-    <ActiveDebugProfile>nexus_one_-_api_28</ActiveDebugProfile>
+    <ActiveDebugProfile>Nexus One - API 28 %28Android 9.0 - API 28%29</ActiveDebugProfile>
+    <SelectedPlatformGroup>Emulator</SelectedPlatformGroup>
   </PropertyGroup>
 </Project>
