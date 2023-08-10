@@ -4,6 +4,7 @@
 #include <BLEUtils.h>
 #include <BLEDevice.h>
 #include <BLEServer.h>
+#include <BLE2902.h>
 #include <HTTPClient.h>
 
 #include "SparkFunBME280.h"
@@ -15,14 +16,25 @@ float humidity = 0;
 
 bool has_wifi_creds = true;
 
-char* ssid = "Home";
-char* pass = "097452430";
-char* azure_update_sens_url = "http://Azure/update-sensor";
+#define MAX_SSID_LEN 50
+#define MAX_PASS_LEN 50
+#define MAX_URL_LEN 200
+
+char* ssid[MAX_SSID_LEN];
+char* pass[MAX_PASS_LEN];
+char* azure_update_sens_url[MAX_URL_LEN];
 // TODO : Those three should be updated by the web app, moreover they should be set to null at first
 
 #define SERVICE_UUID        "71933006-db61-4c41-bfaa-d374279efb65"
 #define TEMP_CHAR_UUID      "f96c20eb-05c7-4c31-803b-03428eae9aa2"
 #define HUMD_CHAR_UUID      "2d4fa781-cf1c-4ea1-9427-14951f794d80"
+#define WIFI_CHAR_UUID      "28919cc6-36d5-11ee-be56-0242ac120002"
+
+enum WIFI_OPS {
+  WIFI_OPS_SSID,
+  WIFI_OPS_PASS,
+  WIFI_OPS_URL
+};
 
 class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
@@ -54,6 +66,35 @@ class HumdCallbacks: public BLECharacteristicCallbacks {
     }
 };
 
+class WifiCallbacks: public BLECharacteristicCallbacks {
+  virtual void onWrite(BLECharacteristic* pCharacteristic, esp_ble_gatts_cb_param_t* param)
+  {
+    if (param->write.len == 0) return;
+
+    // First byte indicates the operation
+    switch((WIFI_OPS)param->write.value[0]) {
+        case(WIFI_OPS_SSID):
+          if (param->write.len-1 > MAX_SSID_LEN) break; // TODO : Can print an error...
+          memcpy(ssid, param->write.value + 1, param->write.len-1);
+          break;
+        case(WIFI_OPS_PASS):
+          if (param->write.len-1 > MAX_PASS_LEN) break; // TODO : Can print an error...
+          memcpy(pass, param->write.value + 1, param->write.len-1);
+          break;
+        case(WIFI_OPS_URL):
+          if (param->write.len-1 > MAX_URL_LEN) break; // TODO : Can print an error...
+          memcpy(azure_update_sens_url, param->write.value + 1, param->write.len-1);
+          break;
+        default:
+          char buff[30] = {0};
+          sprintf(buff, "Error! recv wifi op val: %d\0", param->write.value[0]);
+          Serial.println(buff);
+          break;
+        
+    }
+  }
+};
+
 void setup()
 {
   Serial.begin(115200);
@@ -65,17 +106,16 @@ void setup()
 
   BLEService *pService = pServer->createService(SERVICE_UUID);
 
-  // Making temperature point
+  // Setting temperature point
   BLECharacteristic *pCharacteristic = pService->createCharacteristic(
                                          TEMP_CHAR_UUID,
                                          BLECharacteristic::PROPERTY_READ
                                        );
 
   pCharacteristic->setCallbacks(new TempCallbacks());
-  
   pCharacteristic->setValue(temp);
   
-  // Making humidity point
+  // Setting humidity point
   pCharacteristic = pService->createCharacteristic(
                                          HUMD_CHAR_UUID,
                                          BLECharacteristic::PROPERTY_READ
@@ -83,6 +123,17 @@ void setup()
 
   pCharacteristic->setCallbacks(new HumdCallbacks());
   pCharacteristic->setValue(humidity);
+
+  // Setting point to get wifi creds from
+  pCharacteristic = pService->createCharacteristic(
+                                          WIFI_CHAR_UUID,
+                                          BLECharacteristic::PROPERTY_WRITE
+                                        );
+
+  pCharacteristic->setCallbacks(new WifiCallbacks());
+
+  //BLEDescriptor wifiBleDesc(BLEUUID((uint16_t)0x2902));
+  //pCharacteristic->addDescriptor(&wifiBleDesc);
   pService->start();
 
   BLEAdvertising *pAdvertising = pServer->getAdvertising();
@@ -100,7 +151,7 @@ void setup()
 
 void loop()
 {
-  if (has_wifi_creds) { // If got wifi_creds, trying to publish data via wifi
+  /*if (has_wifi_creds) { // If got wifi_creds, trying to publish data via wifi
     if (WiFi.status() != WL_CONNECTED) { // Trying to connect
       WiFi.begin(ssid, pass);
     } else { // If connected, publishing data
@@ -124,11 +175,11 @@ void loop()
               mySensor.readTempC());           
 
       // Send HTTP POST request
-      /*int httpResponseCode =*/ http.POST(sens_data_str);
+      /*int httpResponseCode = http.POST(sens_data_str);
 
       http.end();
     }
-  }
+  }*/
 
   delay(60); // TODO : When everything works, run this every half a minute
 }
