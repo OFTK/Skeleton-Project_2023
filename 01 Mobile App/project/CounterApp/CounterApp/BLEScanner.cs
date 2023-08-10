@@ -18,6 +18,7 @@ namespace CounterApp
     {
         private readonly string TEMP_CHAR_UUID = "f96c20eb-05c7-4c31-803b-03428eae9aa2";
         private readonly string HUMD_CHAR_UUID = "2d4fa781-cf1c-4ea1-9427-14951f794d80";
+        private readonly string WIFI_CHAR_UUID = "28919cc6-36d5-11ee-be56-0242ac120002";
 
         // Baby Status
 
@@ -25,7 +26,10 @@ namespace CounterApp
         private readonly List<IDevice> _gattDevices = new List<IDevice>();      // Empty list to store BLE devices that can be detected by the Bluetooth adapter
 
 
-        public async Task<MainViewModel.BabyStatus> BLEScan(string ble_uuid)
+        public async Task<MainViewModel.BabyStatus> BLEScan(string ble_uuid, 
+                                                            string wifi_ssid=null, 
+                                                            string wifi_pass=null, 
+                                                            string wifi_url=null)
         {
             // initialize bluetooth adapter
             if (!_bluetoothAdapter.IsScanning)                                                             // Make sure that the Bluetooth adapter is scanning for devices
@@ -103,6 +107,23 @@ namespace CounterApp
 
                                     if (receivedBytes != null)
                                         status._BabyHumd = BitConverter.ToSingle(receivedBytes, 0);
+                                }
+                            }
+                            else if (character.Uuid.ToString() == WIFI_CHAR_UUID)
+                            {
+                                if (character.CanRead and character.canWrite)                                                              // check if characteristic supports read
+                                {
+                                    // First, we check if the IOT device is connected to the network we want it to be connected
+                                    byte[] receivedBytes = await character.ReadAsync();
+
+                                    if (receivedBytes != null)
+                                         if (wifi_ssid != BitConverter.ToString(receivedBytes)) { // If it is not, sending the wifi creds
+                                            // Converting strings to byte arrays
+                                            byte[] b_wifi_ssid, b_wifi_pass, b_wifi_url;
+
+
+                                         }
+
                                 }
                             }
                         }
