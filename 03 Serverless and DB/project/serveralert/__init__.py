@@ -55,7 +55,7 @@ def main(mytimer: func.TimerRequest, signalRMessages: func.Out[str]) -> None:
             alert = {}
             alert["babyid"] = baby.get("babyid")
             alert["babyname"] = baby.get("babyname")
-            alert["alert reason"] = reason
+            alert["alertreason"] = reason
         alert_list.append(alert)
 
     # send signalr to all of the family members
@@ -72,12 +72,12 @@ def main(mytimer: func.TimerRequest, signalRMessages: func.Out[str]) -> None:
     #             {
     #                 "babyid": "1",
     #                 "babyname": "ofek",   
-    #                 "alert reason": "baby status not updated for 5 minutes"
+    #                 "alertreason": "baby status not updated for 5 minutes"
     #             },
     #             {
     #                 "babyid": "2",
     #                 "babyname": "nimrod",
-    #                 "alert reason": "baby status not updated for 5 minutes"
+    #                 "alertreason": "baby status not updated for 5 minutes"
     #             }
     #         ]
     #     }

@@ -109,12 +109,12 @@ samples family and sends signalR message to a hub named "babyalert" with argumen
     {
         "babyid": "1",
         "babyname": "ofek",
-        "alert reason": "baby status not updated for 5 minutes"
+        "alertreason": "baby status not updated for 5 minutes"
     },
     {
         "babyid": "2",
         "babyname": "nimrod",
-        "alert reason": "temprature is too high"
+        "alertreason": "temprature is too high"
     }
 ]
 ```

@@ -27,13 +27,8 @@ def main():
     alert_list = [
         {
             "babyid": "1",
-            "babyname": "test1",
-            "alert reason": "this is a test alert"
-        },
-        {
-            "babyid": "2",
-            "babyname": "test2",
-            "alert reason": "this is another test alert"
+            "babyname": "ofek",
+            "alertreason": "this is a test alert"
         }
     ]
     signalr_message_input = [{

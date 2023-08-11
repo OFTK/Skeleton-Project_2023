@@ -23,7 +23,6 @@ using System.Net.Mime;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
-using Plugin.LocalNotification;
 
 namespace CounterApp
 {
@@ -37,30 +36,38 @@ namespace CounterApp
         public HubConnection connection;
         // private static readonly string baseUrl = "https://skeletonfunctionapp.azurewebsites.net";
         private static readonly string baseUrl = "https://ilovemybaby.azurewebsites.net";
-        private static readonly string getFamilyStatusUrl = baseUrl + "/api/getfamilystatus";
-        private static readonly string updateBabyStatusUrl = baseUrl + "/api/updatebabystatus";
+        private static readonly string getFamilyDetailsUrl = baseUrl + "/api/getfamilystatus";
+        private static readonly string updateBabyDetailsUrl = baseUrl + "/api/updatebabystatus";
 
         public HttpClient client;
 
-        // attributs to display baby status
+        // attributs to display baby details
         static string family = "family";
-        public class FamilyStatus
-        {
-            public string family { get; set; }
-            public List<Status> status { get; set; }
-        }
-
-        public class Status
+        public class BabyDetails
         {
             public string babyname { get; set; }
             public string babyid { get; set; }
+            public string displaystring { get; set; }
+            public bool baby_is_ok { get; set; }
             public DateTime? lastupdate { get; set; }
             public double? latitude { get; set; }
             public double? longtitude { get; set; }
+            public float? temperature { get; set; }
+            public float? humidity { get; set; }
+            
         }
-
+        public class FamilyDetails
+        {
+            public string family { get; set; }
+            public List<BabyDetails> details { get; set; }
+        }
+        public FamilyDetails _localFamilyDetails;
+        public FamilyDetails LocalFamilyDetails { 
+            get => _localFamilyDetails;
+            set => SetProperty(ref _localFamilyDetails, value);
+        }
         
-        public class StatusUpdate
+        public class DetailsUpdate
         {
             public string family { get; set; }
             public string babyname { get; set; }
@@ -68,8 +75,6 @@ namespace CounterApp
             public string latitude { get; set; }
         }
 
-
-        // TODO: use only one status type - this requires to change the API with the server...
         public class BabyStatus
         {
             public float? _BabyTemp = null;
@@ -77,14 +82,14 @@ namespace CounterApp
             public DateTime? _BabyLastSeenTime = null;
         }
 
-
-
-        private FamilyStatus _familystatus;
-        public FamilyStatus FamilyStatusDisplay
+        // alerts from signalr
+        public class BabyAlert
         {
-            get => _familystatus;
-            set => SetProperty(ref _familystatus, value);
+            public string babyname { get; set; }
+            public string alertreason { get; set; }
         }
+        public List<BabyAlert> AlertList { get; set; }
+
 
         // attributes to display messages from server
         private string _displayMessage;
@@ -101,30 +106,18 @@ namespace CounterApp
             set => SetProperty(ref _displayMessage2, value);
         }
 
-        public class BabyAlert
-        {
-            public string babyname { get; set; }
-            public string alertreason { get; set; }
-        }
-        public List<BabyAlert> _alertList;
-        public List<BabyAlert> AlertList
-        {
-            get => _alertList;
-            set => SetProperty(ref _alertList, value);
-        }
-
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        // get baby status from the server
+        // get baby details from the server
         //////////////////////////////////
-        private void GetFamilyStatus()
+        private void GetFamilyDetails()
         {
             // build http request query
-            UriBuilder geturi_builder = new UriBuilder(getFamilyStatusUrl);
+            UriBuilder geturi_builder = new UriBuilder(getFamilyDetailsUrl);
             var query = HttpUtility.ParseQueryString(geturi_builder.Query);
             query["family"] = family;
             geturi_builder.Query = query.ToString();
@@ -139,29 +132,51 @@ namespace CounterApp
             Debug.WriteLine(response_string);
             Debug.WriteLine(connection.ConnectionId);
 
-
-            // update status on screen
-            FamilyStatus deserialize_family_status = JsonConvert.DeserializeObject<FamilyStatus>(response_string);
-            FamilyStatusDisplay = deserialize_family_status;
+            
+            FamilyDetails updatedFamilyDetails = new FamilyDetails();
+            updatedFamilyDetails.details = new List<BabyDetails>();
+            // parse response
+            JObject json = JObject.Parse(response_string);
+            updatedFamilyDetails.family = (string)json["family"];
+            JArray items = (JArray)json["status"];
+            // put each field in item into a new BabyDetails object
+            foreach (JObject item in items)
+            {
+                BabyDetails newbabydetails = new BabyDetails();
+                newbabydetails.babyname = (string)item["babyname"];
+                newbabydetails.babyid = (string)item["babyid"];
+                newbabydetails.displaystring = "Was last seen at: " + (string)item["lastupdate"];
+                newbabydetails.baby_is_ok = true;
+                newbabydetails.lastupdate = (DateTime?)item["lastupdate"];
+                newbabydetails.latitude = (double?)item["latitude"];
+                newbabydetails.longtitude = (double?)item["longtitude"];
+                DisplayMessage = "Got status for " + newbabydetails.babyname;
+                // TODO: add temperature and humidity to the server
+                // baby.temperature = (float?)item["temperature"];
+                // baby.humidity = (float?)item["humidity"];
+                updatedFamilyDetails.details.Add(newbabydetails);
+            }
+            // update the display
+            LocalFamilyDetails = updatedFamilyDetails;
         }
 
-        private void StatusThread()
+        private void GetFamilyDetailsThread()
         {
             while (true)
             {
-                GetFamilyStatus();
+                GetFamilyDetails();
                 Thread.Sleep(60000);
             }
         }
 
-        // update nearby baby status to server
+        // update nearby baby details to server
         //////////////////////////////////////
 
-        private void UpdateServer(BabyStatus baby, Status curr_baby_status)
+        private void UpdateServer(BabyStatus baby, BabyDetails curr_baby_details)
         {
-            // put status from existing types in the type the server expects
-            StatusUpdate babyupdate = new StatusUpdate();
-            babyupdate.babyname = curr_baby_status.babyname;
+            // put details from existing types in the type the server expects
+            DetailsUpdate babyupdate = new DetailsUpdate();
+            babyupdate.babyname = curr_baby_details.babyname;
             babyupdate.family = "family";
             babyupdate.longtitude = 32.3.ToString();
             babyupdate.latitude = 32.3.ToString();
@@ -169,7 +184,7 @@ namespace CounterApp
             // send http request
             HttpClient PostClient = new HttpClient();
             HttpResponseMessage resp = PostClient.PostAsync(
-                updateBabyStatusUrl,
+                updateBabyDetailsUrl,
                 // serialize babyupdate
                 new StringContent(
                     JsonConvert.SerializeObject(babyupdate), Encoding.UTF8, "application/json")
@@ -177,19 +192,19 @@ namespace CounterApp
             Debug.WriteLine(resp.Content.ToString());
         }
 
-        public void UpdateThread()
+        public void UpdateNearbyBabyToServer()
         {
             while (true)
             {
                 var scanner = new BLEScanner();
-                for (int i = 0; i < FamilyStatusDisplay.status.Count; i++)
+                for (int i = 0; i < LocalFamilyDetails.details.Count; i++)
                 {
-                    Status baby = FamilyStatusDisplay.status[i];
-                    BabyStatus result = scanner.BLEScan(baby.babyid).Result;
+                    // scan 
+                    BabyStatus result = scanner.BLEScan(LocalFamilyDetails.details[i].babyid).Result;
                     if (result._BabyTemp != null)
                     {
                         Debug.WriteLine("sampled baby temp");
-                        UpdateServer(result, baby);
+                        UpdateServer(result, LocalFamilyDetails.details[i]);
                     }
                 }
                 Thread.Sleep(1000);
@@ -198,48 +213,41 @@ namespace CounterApp
 
         // handle server alert
         //////////////////////
-        // example for message:
-        // {
-        //     'alert_list': [
-        //         {
-        //             "babyid": "1",
-        //             "babyname": "ofek",
-        //             "alert reason": "baby status not updated for 5 minutes"
-        //         },
-        //         {
-        //             "babyid": "2",
-        //             "babyname": "nimrod",
-        //             "alert reason": "baby status not updated for 5 minutes"
-        //         }
-        //     ]
-        // }
         public void HandleAlert(string message)
         {
             // deserialize message and get alert_list
             JObject deserialize_message = JObject.Parse(message);
             JArray alert_list = (JArray)deserialize_message["alert_list"];
 
-            // create a baby alert for each alert in alert list
-            List<BabyAlert> baby_alert_list = new List<BabyAlert>();
+            // clone LocalFamilyDetails into updatedFamilyDetails
+            FamilyDetails updatedFamilyDetails = new FamilyDetails();
+            updatedFamilyDetails.family = LocalFamilyDetails.family;
+            updatedFamilyDetails.details = new List<BabyDetails>();
+            foreach (BabyDetails baby in LocalFamilyDetails.details)
+            {
+                updatedFamilyDetails.details.Add(baby);
+            }
+
+            // foreach alert: change list appearance and text to show alert
             foreach (JObject alert in alert_list)
             {
-                BabyAlert baby_alert = new BabyAlert();
-                baby_alert.babyname = (string)alert["babyname"];
-                baby_alert.alertreason = (string)alert["alert reason"];
-                baby_alert_list.Add(baby_alert);
+                // get babyname and alertreason
+                string babyname = (string)alert["babyname"];
+                string alertreason = (string)alert["alertreason"];
+                // find baby in list
+
+                foreach (BabyDetails baby in updatedFamilyDetails.details)
+                {
+                    if (baby.babyname == babyname)
+                    {
+                        // change baby appearance
+                        baby.baby_is_ok = false;
+                        baby.displaystring = alertreason;
+                    }
+                }
             }
-            AlertList = baby_alert_list;
-
-            DisplayMessage2 = "raising notification";
-
-            var notification = new NotificationRequest
-            {
-                Description = "Baby Alert!",
-                Title = "Baby Alert",
-            };
-            NotificationCenter.Current.Show(notification);
-            DisplayMessage = "notification raised";
-
+            // update the display
+            LocalFamilyDetails = updatedFamilyDetails;
         }
 
 
@@ -255,6 +263,7 @@ namespace CounterApp
                 Debug.WriteLine(data.ToString());
                 string receivedMessage = data.ToString();
                 HandleAlert(receivedMessage);
+                DisplayMessage = "handled alert";
             });
 
             connection.Closed += async (error) =>
@@ -266,8 +275,6 @@ namespace CounterApp
 
             await connection.StartAsync();
 
-            DisplayMessage = "Connected to SignalR";
-            DisplayMessage2 = "Connected to SignalR";
             Debug.WriteLine("connected to signalr");
 
         }
@@ -283,12 +290,11 @@ namespace CounterApp
             client = new HttpClient();
             connection = new HubConnectionBuilder().WithUrl(new Uri(baseUrl + "/api")).Build();
             Task signalr_connection_task = Task.Run(async () => await ConnectToSignalr());
-            FamilyStatusDisplay = new FamilyStatus();
-            GetFamilyStatus();
-            Thread update_family_status_thread = new Thread(StatusThread){};
-            update_family_status_thread.Start();
-            Thread update_baby_status_thread = new Thread(UpdateThread) { };
-            update_baby_status_thread.Start();
+            GetFamilyDetails();
+            Thread get_family_details_thread = new Thread(GetFamilyDetailsThread){};
+            get_family_details_thread.Start();
+            Thread update_nearby_baby_to_server_thread = new Thread(UpdateNearbyBabyToServer) { };
+            update_nearby_baby_to_server_thread.Start();
             client.Dispose();
         }
 

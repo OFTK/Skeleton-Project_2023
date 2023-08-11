@@ -14,6 +14,7 @@ namespace CounterApp
         public MainPage()
         {
             InitializeComponent();
+            BindingContext = new MainViewModel();
         }
 
         protected async override void OnAppearing()
@@ -39,5 +40,12 @@ namespace CounterApp
 
             return status == PermissionStatus.Granted;
         }
+
+        void OnItemTapped(object sender, ItemTappedEventArgs e)
+        {
+            if (e.Item == null) return;
+            ((ListView)sender).SelectedItem = null;
+        }
+
     }
 }

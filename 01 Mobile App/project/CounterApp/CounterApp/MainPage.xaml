@@ -3,16 +3,20 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:CounterApp"
              x:Class="CounterApp.MainPage"
-             Title="Tinoki">
+             Title="I LOVE MY BABY">
+    
 
 
     <StackLayout>
-        <Label Text="I LOVE MY TINOKI" HorizontalOptions="Center" FontSize="Title" FontAttributes="Bold" Margin="20"/>
+        <Label Text="I LOVE MY BABY" HorizontalOptions="Center" FontSize="Title" FontAttributes="Bold" Margin="20"/>
 
-        <ListView ItemsSource="{Binding FamilyStatusDisplay.status}" SeparatorColor="DarkGray">
+        <ListView x:Name="FamilyStatusListView"
+                  ItemsSource="{Binding LocalFamilyDetails.details}"
+                  ItemTapped="OnItemTapped"
+                  SeparatorColor="DarkGray">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <TextCell Text="{Binding babyname, StringFormat='{0}:'}" TextColor="DarkSlateGray" Detail="{Binding lastupdate, StringFormat='last seen on {0}'}"/>
+                        <TextCell Text="{Binding babyname, StringFormat='{0}'}" TextColor="DarkSlateGray" Detail="{Binding displaystring}"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
