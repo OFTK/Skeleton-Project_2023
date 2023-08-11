@@ -14,9 +14,9 @@ def update_baby_status(family: str, babyname: str, longtitude: float, latitude: 
 
 
 def main():
-    localurl_base = "http://localhost:7071/api/"
-    remoteurl_base = "" #TODO
-    update_baby_status("family", "ofek", 37.12345, 38.12435, localurl_base+"updatebabystatus")
+    localurl_base = "http://localhost:7071"
+    remoteurl_base = "https://ilovemybaby.azurewebsites.net"
+    update_baby_status("family", "nimrod", 37.12345, 38.12435, remoteurl_base+"/api/updatebabystatus")
 
 if __name__ == '__main__':
     main()

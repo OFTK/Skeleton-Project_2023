@@ -2,6 +2,13 @@
   "scriptFile": "__init__.py",
   "bindings": [
     {
+      "type": "signalR",
+      "name": "signalRMessages",
+      "hubName": "babyalert",
+      "connectionStringSetting": "AzureSignalRConnectionString",
+      "direction": "out"
+    },
+    {
       "authLevel": "anonymous",
       "type": "httpTrigger",
       "direction": "in",
@@ -14,13 +21,6 @@
       "type": "http",
       "direction": "out",
       "name": "$return"
-    },
-    {
-      "type": "signalRConnectionInfo",
-      "name": "connectionInfo",
-      "hubName": "babyalert",
-      "connectionStringSetting": "AzureSignalRConnectionString",
-      "direction": "in"
     }
   ]
 }

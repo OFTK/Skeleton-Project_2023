@@ -1,9 +1,9 @@
 :: publish serverless and DB
 
 :: deploy storage account
-@REM az storage table create --name project --connection-string DefaultEndpointsProtocol=https;AccountName=skeletonwebjobsstorage;AccountKey=mruuYxVNkKXUmXQnSZXiE+duyQd5Ez6I7MS88Jf0LjSmGsFNvm9LwGAy/lLFWTZ3HojulpK+MlHV+AStZqL4aw==;EndpointSuffix=core.windows.net --fail-on-exist
+@REM az storage table create --name project --connection-string DefaultEndpointsProtocol=https;AccountName=iotworkshopb0d6;AccountKey=jotKz3BQqCMegQsAkZMpOIA0f48sicw9XnnX7UYvohDWpisGveUvwgqG/M030UXyzsKs9uwYZrej+AStGxWt4A==;EndpointSuffix=core.windows.net --fail-on-exist
 
 :: deploy functions
-func azure functionapp publish skeletonfunctionapp --publish-local-settings
-func azure functionapp logstream skeletonfunctionapp --browser
+func azure functionapp publish ilovemybaby --publish-local-settings
+@REM func azure functionapp logstream ilovemybaby --browser
 

@@ -4,9 +4,6 @@
              xmlns:local="clr-namespace:CounterApp"
              x:Class="CounterApp.MainPage"
              Title="Tinoki">
-    <ContentPage.BindingContext>
-        <local:MainViewModel/>
-    </ContentPage.BindingContext>
 
 
     <StackLayout>

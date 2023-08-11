@@ -21,6 +21,9 @@ using static Xamarin.Essentials.Permissions;
 using XamarinEssentials = Xamarin.Essentials;
 using System.Net.Mime;
 using System.Text;
+using Newtonsoft.Json.Linq;
+using System.Diagnostics;
+using Plugin.LocalNotification;
 
 namespace CounterApp
 {
@@ -29,12 +32,11 @@ namespace CounterApp
 
         // fields
         /////////
-
+        
         // connection and display
         public HubConnection connection;
-        private static readonly string baseUrl          = "https://skeletonfunctionapp.azurewebsites.net";
-
-        //private static readonly string baseUrl = "http://10.0.2.2:7071"; // this is the address to connect to the host
+        // private static readonly string baseUrl = "https://skeletonfunctionapp.azurewebsites.net";
+        private static readonly string baseUrl = "https://ilovemybaby.azurewebsites.net";
         private static readonly string getFamilyStatusUrl = baseUrl + "/api/getfamilystatus";
         private static readonly string updateBabyStatusUrl = baseUrl + "/api/updatebabystatus";
 
@@ -99,6 +101,19 @@ namespace CounterApp
             set => SetProperty(ref _displayMessage2, value);
         }
 
+        public class BabyAlert
+        {
+            public string babyname { get; set; }
+            public string alertreason { get; set; }
+        }
+        public List<BabyAlert> _alertList;
+        public List<BabyAlert> AlertList
+        {
+            get => _alertList;
+            set => SetProperty(ref _alertList, value);
+        }
+
+
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -121,7 +136,8 @@ namespace CounterApp
 
             // display the response for debug purposes
             string response_string = resp.Content.ReadAsStringAsync().Result;
-            DisplayMessage = response_string;
+            Debug.WriteLine(response_string);
+            Debug.WriteLine(connection.ConnectionId);
 
 
             // update status on screen
@@ -158,7 +174,7 @@ namespace CounterApp
                 new StringContent(
                     JsonConvert.SerializeObject(babyupdate), Encoding.UTF8, "application/json")
                 ).Result;
-
+            Debug.WriteLine(resp.Content.ToString());
         }
 
         public void UpdateThread()
@@ -172,7 +188,7 @@ namespace CounterApp
                     BabyStatus result = scanner.BLEScan(baby.babyid).Result;
                     if (result._BabyTemp != null)
                     {
-                        DisplayMessage = "Temperature: " + result._BabyTemp.ToString() + "\nHumidity: " + result._BabyHumd.ToString() + "\n, Time: " + result._BabyLastSeenTime.ToString();
+                        Debug.WriteLine("sampled baby temp");
                         UpdateServer(result, baby);
                     }
                 }
@@ -180,21 +196,80 @@ namespace CounterApp
             }
         }
 
+        // handle server alert
+        //////////////////////
+        // example for message:
+        // {
+        //     'alert_list': [
+        //         {
+        //             "babyid": "1",
+        //             "babyname": "ofek",
+        //             "alert reason": "baby status not updated for 5 minutes"
+        //         },
+        //         {
+        //             "babyid": "2",
+        //             "babyname": "nimrod",
+        //             "alert reason": "baby status not updated for 5 minutes"
+        //         }
+        //     ]
+        // }
+        public void HandleAlert(string message)
+        {
+            // deserialize message and get alert_list
+            JObject deserialize_message = JObject.Parse(message);
+            JArray alert_list = (JArray)deserialize_message["alert_list"];
+
+            // create a baby alert for each alert in alert list
+            List<BabyAlert> baby_alert_list = new List<BabyAlert>();
+            foreach (JObject alert in alert_list)
+            {
+                BabyAlert baby_alert = new BabyAlert();
+                baby_alert.babyname = (string)alert["babyname"];
+                baby_alert.alertreason = (string)alert["alert reason"];
+                baby_alert_list.Add(baby_alert);
+            }
+            AlertList = baby_alert_list;
+
+            DisplayMessage2 = "raising notification";
+
+            var notification = new NotificationRequest
+            {
+                Description = "Baby Alert!",
+                Title = "Baby Alert",
+            };
+            NotificationCenter.Current.Show(notification);
+            DisplayMessage = "notification raised";
+
+        }
+
+
         // signalr tasks
         ////////////////
         private async Task ConnectToSignalr()
         {
-            // on alert - activate alert flow
-            connection.On<string>("counterUpdate", (data) =>
+
+            connection.On<Object>("babyalert", (data) =>
             {
-                // TODO: add alert flow
+                Debug.WriteLine("received new message");
+                DisplayMessage = "received a new message";
+                Debug.WriteLine(data.ToString());
+                string receivedMessage = data.ToString();
+                HandleAlert(receivedMessage);
             });
+
             connection.Closed += async (error) =>
             {
+                Debug.WriteLine("restarting connection in 5 seconds");
                 await Task.Delay(new Random().Next(0, 5) * 1000);
                 await connection.StartAsync();
             };
+
             await connection.StartAsync();
+
+            DisplayMessage = "Connected to SignalR";
+            DisplayMessage2 = "Connected to SignalR";
+            Debug.WriteLine("connected to signalr");
+
         }
 
         // to send messages to signalr do:
