@@ -14,16 +14,15 @@ BME280 mySensor;
 float temp = 0;
 float humidity = 0;
 
-bool has_wifi_creds = true;
+bool has_wifi_creds = false;
 
 #define MAX_SSID_LEN 50
 #define MAX_PASS_LEN 50
 #define MAX_URL_LEN 200
 
-char* ssid[MAX_SSID_LEN];
-char* pass[MAX_PASS_LEN];
-char* azure_update_sens_url[MAX_URL_LEN];
-// TODO : Those three should be updated by the web app, moreover they should be set to null at first
+char ssid[MAX_SSID_LEN + 1] = {0};
+char pass[MAX_PASS_LEN + 1] = {0};
+char azure_update_sens_url[MAX_URL_LEN + 1] = {0};
 
 #define SERVICE_UUID        "71933006-db61-4c41-bfaa-d374279efb65"
 #define TEMP_CHAR_UUID      "f96c20eb-05c7-4c31-803b-03428eae9aa2"
@@ -31,9 +30,9 @@ char* azure_update_sens_url[MAX_URL_LEN];
 #define WIFI_CHAR_UUID      "28919cc6-36d5-11ee-be56-0242ac120002"
 
 enum WIFI_OPS {
-  WIFI_OPS_SSID,
-  WIFI_OPS_PASS,
-  WIFI_OPS_URL
+  WIFI_OPS_SSID = 0,
+  WIFI_OPS_PASS = 1,
+  WIFI_OPS_URL = 2
 };
 
 class MyServerCallbacks: public BLEServerCallbacks {
@@ -73,15 +72,15 @@ class WifiCallbacks: public BLECharacteristicCallbacks {
 
     // First byte indicates the operation
     switch((WIFI_OPS)param->write.value[0]) {
-        case(WIFI_OPS_SSID):
+        case WIFI_OPS_SSID:
           if (param->write.len-1 > MAX_SSID_LEN) break; // TODO : Can print an error...
           memcpy(ssid, param->write.value + 1, param->write.len-1);
           break;
-        case(WIFI_OPS_PASS):
+        case WIFI_OPS_PASS:
           if (param->write.len-1 > MAX_PASS_LEN) break; // TODO : Can print an error...
           memcpy(pass, param->write.value + 1, param->write.len-1);
           break;
-        case(WIFI_OPS_URL):
+        case WIFI_OPS_URL:
           if (param->write.len-1 > MAX_URL_LEN) break; // TODO : Can print an error...
           memcpy(azure_update_sens_url, param->write.value + 1, param->write.len-1);
           break;
@@ -90,10 +89,21 @@ class WifiCallbacks: public BLECharacteristicCallbacks {
           sprintf(buff, "Error! recv wifi op val: %d\0", param->write.value[0]);
           Serial.println(buff);
           break;
-        
+    }
+
+    if (ssid[0] != '\0' && pass[0] != '\0' && azure_update_sens_url[0] != '\0') {
+        pCharacteristic->setValue(ssid);
+        has_wifi_creds = true;
     }
   }
 };
+
+void wifi_disconnected(WiFiEvent_t event, WiFiEventInfo_t info) { // On disconnection event, ask the user to send creds again
+  has_wifi_creds = false;
+  memset(ssid, 0, sizeof(ssid));
+  memset(pass, 0, sizeof(pass));
+  memset(azure_update_sens_url, 0, sizeof(azure_update_sens_url));
+}
 
 void setup()
 {
@@ -127,13 +137,11 @@ void setup()
   // Setting point to get wifi creds from
   pCharacteristic = pService->createCharacteristic(
                                           WIFI_CHAR_UUID,
-                                          BLECharacteristic::PROPERTY_WRITE
+                                          BLECharacteristic::PROPERTY_WRITE | 
+                                          BLECharacteristic::PROPERTY_READ
                                         );
 
   pCharacteristic->setCallbacks(new WifiCallbacks());
-
-  //BLEDescriptor wifiBleDesc(BLEUUID((uint16_t)0x2902));
-  //pCharacteristic->addDescriptor(&wifiBleDesc);
   pService->start();
 
   BLEAdvertising *pAdvertising = pServer->getAdvertising();
@@ -147,19 +155,22 @@ void setup()
     Serial.println("The sensor did not respond. Please check wiring.");
     while(1); //Freeze
   }
+
+  // Wifi setup
+  WiFi.onEvent(wifi_disconnected, ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
 }
 
 void loop()
 {
-  /*if (has_wifi_creds) { // If got wifi_creds, trying to publish data via wifi
-    if (WiFi.status() != WL_CONNECTED) { // Trying to connect
-      WiFi.begin(ssid, pass);
-    } else { // If connected, publishing data
+  if (has_wifi_creds) { // If got wifi_creds, trying to publish data via wifi
+    if (WiFi.status() != WL_CONNECTED && WiFi.status() != WL_IDLE_STATUS) { // Trying to connect
+        WiFi.begin(ssid, pass);
+        delay(1000);  
+    } else if (WiFi.status() == WL_CONNECTED) { // If connected, publishing data
       WiFiClient client;
       HTTPClient http;
-      char sens_data_str[100] = {'\0'};
-
-       http.begin(client, azure_update_sens_url);
+      char sens_data_str[300] = {'\0'};
+      /* http.begin(client, azure_update_sens_url);
        
        // If you need Node-RED/server authentication, insert user and password below
       //http.setAuthorization("REPLACE_WITH_SERVER_USERNAME", "REPLACE_WITH_SERVER_PASSWORD");
@@ -175,11 +186,11 @@ void loop()
               mySensor.readTempC());           
 
       // Send HTTP POST request
-      /*int httpResponseCode = http.POST(sens_data_str);
+      int httpResponseCode = http.POST(sens_data_str);*/
 
       http.end();
     }
-  }*/
+  }
 
-  delay(60); // TODO : When everything works, run this every half a minute
+  delay(6000); // TODO : When everything works, run this every half a minute
 }
