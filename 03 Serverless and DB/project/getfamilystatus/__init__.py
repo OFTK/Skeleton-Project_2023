@@ -40,8 +40,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                         'babyname': entity['RowKey'],
                         'babyid': entity['babyid'],
                         'lastupdate': entity['lastupdate'],
-                        'latitude': entity['latitude'],
-                        'longtitude': entity['longtitude']
+                        'details': entity['details']
                     })
                 except:
                     logging.info(f"got the last status of {entity['RowKey']} {entity['PartitionKey']}")
@@ -49,8 +48,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                         'babyname': entity['RowKey'],
                         'babyid': entity['babyid'],
                         'lastupdate': None,
-                        'latitude': None,
-                        'longtitude': None
+                        'details': None
                     })
 
             

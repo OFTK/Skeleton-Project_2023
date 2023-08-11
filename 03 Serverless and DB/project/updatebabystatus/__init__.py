@@ -19,22 +19,37 @@ def main(req: func.HttpRequest, signalRMessages: func.Out[str]) -> func.HttpResp
     try:
         family = req_body.get('family').lower()
         babyname = req_body.get('babyname').lower()
-        longtitude = req_body.get('longtitude')
-        latitude = req_body.get('latitude')
+        details = req_body.get('details')
     except:
         return func.HttpResponse(
              "request must contain family, babyname, longtitude and latitude",
              status_code=400
         )
     try:
-        longtitude = float(longtitude)
-        latitude = float(latitude)
-    except:
+        details_json = json.loads(json.dumps(details))
+    except ValueError:
         return func.HttpResponse(
-             "longtitude and latitude are supposed to be floats",
+             f"details must be a json string, but it's value is: {details}",
              status_code=400
         )
-
+    try:
+        location = details.get('location')
+        temprature = details.get('temprature')
+        humidity = details.get('humidity')
+    except:
+        return func.HttpResponse(
+             "details must contain location, temprature and humidity",
+             status_code=400
+        )
+    try:
+        temprature = float(temprature)
+        humidity = float(humidity)
+    except:
+        return func.HttpResponse(
+             "temprature and humidity must be floats",
+             status_code=400
+        )
+    
     # authenticate & authorize
     # TODO
 
@@ -58,9 +73,8 @@ def main(req: func.HttpRequest, signalRMessages: func.Out[str]) -> func.HttpResp
             # udpate time and location
             update_time = datetime.now().isoformat()
             logging.info(f"update time is set to {update_time}")
-            entity['latitude'] = latitude
-            entity['longtitude'] = longtitude
             entity['lastupdate'] = update_time
+            entity['details'] = json.dumps(details)
             logging.warning(f"trying to update {babyname} in the DB")
             table.update_entity(entity=entity, mode='replace')
             
