@@ -13,6 +13,7 @@
         <ListView x:Name="FamilyStatusListView"
                   ItemsSource="{Binding LocalFamilyDetails.details}"
                   ItemTapped="OnItemTapped"
+                  PropertyChanged="FamilyStatusListView_PropertyChanged"
                   SeparatorColor="DarkGray">
             <ListView.ItemTemplate>
                 <DataTemplate>
