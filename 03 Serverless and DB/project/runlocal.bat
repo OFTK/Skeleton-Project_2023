@@ -1,2 +1,2 @@
 pip install -r requirements.txt
-func start
+func start --cors *

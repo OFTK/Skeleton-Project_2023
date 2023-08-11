@@ -2,8 +2,8 @@
   "IsEncrypted": false,
   "Values": {
     "FUNCTIONS_WORKER_RUNTIME": "python",
-    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=skeletonwebjobsstorage;AccountKey=mruuYxVNkKXUmXQnSZXiE+duyQd5Ez6I7MS88Jf0LjSmGsFNvm9LwGAy/lLFWTZ3HojulpK+MlHV+AStZqL4aw==;EndpointSuffix=core.windows.net",
-    "AzureSignalRConnectionString": "Endpoint=https://skeletonsignalr1.service.signalr.net;AccessKey=NIHnCete1iaNZVJDLenUX7eTiI5TXhfoH5raE/XZDnA=;Version=1.0;",
+    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=iotworkshopb0d6;AccountKey=jotKz3BQqCMegQsAkZMpOIA0f48sicw9XnnX7UYvohDWpisGveUvwgqG/M030UXyzsKs9uwYZrej+AStGxWt4A==;EndpointSuffix=core.windows.net",
+    "AzureSignalRConnectionString": "Endpoint=https://ilovemybaby.service.signalr.net;AccessKey=xRcf1pYW4HdEP3YOeMohWeg7+br2mTZpv47MQsvvKu0=;Version=1.0;",
     "NONSkeletonDev_function_app_listener_EVENTHUB": "Endpoint=sb://non-skeletondev.servicebus.windows.net/;SharedAccessKeyName=function_app_listener;SharedAccessKey=bYFaHbgLNDDbwAW3WHFXFZO+Vk12vZXKL+AEhFPOeUw=;EntityPath=skeletoneventhub",
     "AzureWebJobs.getcounter.Disabled": "false",
     "AzureWebJobs.negotiate.Disabled": "false",
@@ -11,6 +11,7 @@
     "AzureWebJobs.updatecounter.Disabled": "false"
   },
   "Host": {
+    "LocalHttpPort": 7071,
     "CORS": "*"
   }
 }
