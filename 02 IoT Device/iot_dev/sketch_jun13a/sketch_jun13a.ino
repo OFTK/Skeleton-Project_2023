@@ -6,13 +6,24 @@
 #include <BLEServer.h>
 #include <BLE2902.h>
 #include <HTTPClient.h>
+#include <sys/random.h>
 
 #include "SparkFunBME280.h"
+#include "AESLib.h"
 
+// Encryption globals
+AESLib aes;
+
+byte aes_sync[N_BLOCK] = { 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA }; // Random on every startup
+byte aes_key[N_BLOCK] = { 0xa1, 0x95, 0x1f, 0x50, 0xe5, 0x66, 0x8b, 0xb7, 0x23, 0xd4, 0xfa, 0x8a, 0xb3, 0x5a, 0xef, 0x14 }; // Constant for every iot dev
+
+// Sensor globals
 BME280 mySensor;
 
 float temp = 0;
 float humidity = 0;
+
+// Wifi globals
 
 bool has_wifi_creds = false;
 
@@ -24,10 +35,13 @@ char ssid[MAX_SSID_LEN + 1] = {0};
 char pass[MAX_PASS_LEN + 1] = {0};
 char azure_update_sens_url[MAX_URL_LEN + 1] = {0};
 
+// BLE globals
+
 #define SERVICE_UUID        "71933006-db61-4c41-bfaa-d374279efb65"
 #define TEMP_CHAR_UUID      "f96c20eb-05c7-4c31-803b-03428eae9aa2"
 #define HUMD_CHAR_UUID      "2d4fa781-cf1c-4ea1-9427-14951f794d80"
 #define WIFI_CHAR_UUID      "28919cc6-36d5-11ee-be56-0242ac120002"
+#define SYNC_CHAR_UUID      "3b4fa77b-bb0b-4b12-8ee6-913382a4f2a0"
 
 enum WIFI_OPS {
   WIFI_OPS_SSID = 0,
@@ -72,23 +86,35 @@ class WifiCallbacks: public BLECharacteristicCallbacks {
 
     // First byte indicates the operation
     switch((WIFI_OPS)param->write.value[0]) {
-        case WIFI_OPS_SSID:
-          if (param->write.len-1 > MAX_SSID_LEN) break; // TODO : Can print an error...
+        case WIFI_OPS_SSID: 
+        {
+          if (param->write.len-1 > MAX_SSID_LEN) break;
           memcpy(ssid, param->write.value + 1, param->write.len-1);
           break;
-        case WIFI_OPS_PASS:
-          if (param->write.len-1 > MAX_PASS_LEN) break; // TODO : Can print an error...
-          memcpy(pass, param->write.value + 1, param->write.len-1);
-          break;
-        case WIFI_OPS_URL:
-          if (param->write.len-1 > MAX_URL_LEN) break; // TODO : Can print an error...
-          memcpy(azure_update_sens_url, param->write.value + 1, param->write.len-1);
-          break;
-        default:
-          char buff[30] = {0};
-          sprintf(buff, "Error! recv wifi op val: %d\0", param->write.value[0]);
+        }
+        case WIFI_OPS_PASS: // This value is encrypted, we need to decrypt it 
+        {
+          if (param->write.len-1 > MAX_PASS_LEN) break;
+          //memcpy(pass, param->write.value + 1, param->write.len-1);
+          aes.decrypt(param->write.value + 1, param->write.len - 1, (byte*)pass, aes_key, 128, aes_sync);
+          char buff[200] = {0};
+          sprintf(buff, "pass: %s\0", pass);
           Serial.println(buff);
           break;
+        }
+        case WIFI_OPS_URL:
+        {
+          if (param->write.len-1 > MAX_URL_LEN) break;
+          memcpy(azure_update_sens_url, param->write.value + 1, param->write.len-1);
+          break;
+        }
+        default:
+        {
+          // char buff[30] = {0};
+          // sprintf(buff, "Error! recv wifi op val: %d\0", param->write.value[0]);
+          // Serial.println(buff);
+          break;
+        }
     }
 
     if (ssid[0] != '\0' && pass[0] != '\0' && azure_update_sens_url[0] != '\0') {
@@ -105,9 +131,28 @@ void wifi_disconnected(WiFiEvent_t event, WiFiEventInfo_t info) { // On disconne
   memset(azure_update_sens_url, 0, sizeof(azure_update_sens_url));
 }
 
+void aes_init() {
+  // Generating random sync
+  esp_fill_random(aes_sync, N_BLOCK);
+  for (int i=0; i < N_BLOCK;i++) if (aes_sync[i] == 0) aes_sync[i] = 1; // We use it after as a string
+  // TODO : DEBUG REMOVE
+  int i;
+  for (i = 0; i < 16; i++)
+  {
+      if (i > 0) printf(":");
+      printf("%02X", aes_sync[i]);
+  }
+  printf("\n");
+// -------------------
+  aes.set_paddingmode(paddingMode::CMS);
+}
+
 void setup()
 {
   Serial.begin(115200);
+
+  // AES setup
+  aes_init();
 
   // BLE setup
   BLEDevice::init("TINOKIBLE");
@@ -142,6 +187,17 @@ void setup()
                                         );
 
   pCharacteristic->setCallbacks(new WifiCallbacks());
+
+// Setting sync point (for AES128 iv)
+  pCharacteristic = pService->createCharacteristic(
+                                          SYNC_CHAR_UUID,
+                                          BLECharacteristic::PROPERTY_READ
+                                        );
+  char aes_temp[N_BLOCK + 1];
+  memcpy(aes_temp, aes_sync, N_BLOCK);
+  aes_temp[N_BLOCK] = '\0';
+  pCharacteristic->setValue(aes_temp);
+
   pService->start();
 
   BLEAdvertising *pAdvertising = pServer->getAdvertising();
