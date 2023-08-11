@@ -98,3 +98,27 @@ response is a json with the following structure:
 ```
 
 The null fields in sivan's last update is in case the baby was added, but an update was never sent.
+
+#### serveralert
+
+timer trigger - triggers every other minute (" 0 * /2 * * * * ").
+samples family and sends signalR message to a hub named "babyalert" with argument field of the following scheme:
+
+```json
+[
+    {
+        "babyid": "1",
+        "babyname": "ofek",
+        "alert reason": "baby status not updated for 5 minutes"
+    },
+    {
+        "babyid": "2",
+        "babyname": "nimrod",
+        "alert reason": "temprature is too high"
+    }
+]
+```
+
+#### serveralerttest
+
+http trigger. gets json from push request body, and sends it as the argument field in a signalr message to a hub names "babyalert".
