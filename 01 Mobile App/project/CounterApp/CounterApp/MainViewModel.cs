@@ -50,8 +50,7 @@ namespace CounterApp
             public string displaystring { get; set; }
             public bool baby_is_ok { get; set; }
             public DateTime? lastupdate { get; set; }
-            public double? latitude { get; set; }
-            public double? longtitude { get; set; }
+            public string location { get; set; }
             public float? temperature { get; set; }
             public float? humidity { get; set; }
             
@@ -145,15 +144,17 @@ namespace CounterApp
                 BabyDetails newbabydetails = new BabyDetails();
                 newbabydetails.babyname = (string)item["babyname"];
                 newbabydetails.babyid = (string)item["babyid"];
+                DateTime? lastupdate = (DateTime?)item["lastupdate"];
+                // TODO: convert from east europe time to local time
+                newbabydetails.lastupdate = lastupdate;
+                JObject babydetails = JObject.Parse((string)item["details"]);
+                newbabydetails.location = (string)babydetails["location"];
+                newbabydetails.temperature = (float?)babydetails["temperature"];
+                newbabydetails.humidity = (float?)babydetails["humidity"];
                 newbabydetails.displaystring = "Was last seen at: " + (string)item["lastupdate"];
                 newbabydetails.baby_is_ok = true;
-                newbabydetails.lastupdate = (DateTime?)item["lastupdate"];
-                newbabydetails.latitude = (double?)item["latitude"];
-                newbabydetails.longtitude = (double?)item["longtitude"];
+
                 DisplayMessage = "Got status for " + newbabydetails.babyname;
-                // TODO: add temperature and humidity to the server
-                // baby.temperature = (float?)item["temperature"];
-                // baby.humidity = (float?)item["humidity"];
                 updatedFamilyDetails.details.Add(newbabydetails);
             }
             // update the display
@@ -172,14 +173,31 @@ namespace CounterApp
         // update nearby baby details to server
         //////////////////////////////////////
 
-        private void UpdateServer(BabyStatus baby, BabyDetails curr_baby_details)
+        private void UpdateServer(BabyStatus sampled_baby_data, BabyDetails baby_status_from_server)
         {
-            // put details from existing types in the type the server expects
-            DetailsUpdate babyupdate = new DetailsUpdate();
-            babyupdate.babyname = curr_baby_details.babyname;
-            babyupdate.family = "family";
-            babyupdate.longtitude = 32.3.ToString();
-            babyupdate.latitude = 32.3.ToString();
+            // exmple for request body
+            // {
+            //     "family": "family",
+            //     "babyname": "ofek",
+            //     "details": {
+            //         "location": "<some location string>",
+            //         "temprature": 0.0,
+            //         "humidity": 0.0
+            //     }
+            // }
+            // organize details and babyname and family into a json object the server expects
+            JObject babydetails = new JObject
+            {
+                ["location"] = "<TBD LOCATION STRING>",
+                ["temperature"] = sampled_baby_data._BabyTemp,
+                ["humidity"] = sampled_baby_data._BabyHumd
+            };
+            JObject request = new JObject
+            {
+                ["details"] = babydetails,
+                ["babyname"] = baby_status_from_server.babyname,
+                ["family"] = "family"
+            };
 
             // send http request
             HttpClient PostClient = new HttpClient();
@@ -187,7 +205,7 @@ namespace CounterApp
                 updateBabyDetailsUrl,
                 // serialize babyupdate
                 new StringContent(
-                    JsonConvert.SerializeObject(babyupdate), Encoding.UTF8, "application/json")
+                    JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json")
                 ).Result;
             Debug.WriteLine(resp.Content.ToString());
         }

@@ -114,8 +114,7 @@ def main(req: func.HttpRequest, signalRMessages: func.Out[str]) -> func.HttpResp
                 u'PartitionKey': u'{}'.format(family),
                 u'RowKey': u'{}'.format(babyname),
                 u'babyid': u'{}'.format(babyid),
-                u'latitude': 0.0,
-                u'longtitude': 0.0
+                u'details': u''
             }
             
             logging.warning(f"trying to add {new_baby_entity} to the DB")

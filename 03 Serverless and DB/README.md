@@ -54,11 +54,15 @@ no requirements for the header, by the body needs to contain a json of the follo
 
 ```json
 {
-    "family": "<FAMILY NAME>",
-    "babyname": "<BABY NAME>",
-    "longtitude": "<float: LONGTITUDE OF CARETAKER>",
-    "latitude": "<float: LATITUDE OF CARETAKER'S LOCATION>"
-}
+        "family": "family",
+        "babyname": "ofek",
+        "details": 
+        {
+            "location": "SOME LOCATION STRING",
+            "temprature": 25.5,
+            "humidity": 50.0
+        }
+    }
 ```
 
 #### getfamilystatus
@@ -70,34 +74,31 @@ response is a json with the following structure:
 
 ```json
 {
-    "family": "family",
-    "status": [
+    "family": "family", 
+    "status":[
         {
-            "babyname": "nimrod",
-            "babyid": "abcdef",
-            "lastupdate": "2020-06-03T18:37:20.028312",
-            "latitude": 38.12435,
-            "longtitude": 37.12345
+            "babyname": "nimrod", 
+            "babyid": "82933006-db71-4c41-bfaa-d374279efb66", 
+            "lastupdate": "2023-08-11T20:19:34.874480", 
+            "details": "{\"location\": \"SOME LOCATION STRING\", \"temprature\": 25.5, \"humidity\": 50.0}"
         },
         {
-            "babyname": "nitzan",
-            "babyid": "abcde",
-            "lastupdate": "2023-06-03T18:39:10.074640",
-            "latitude": 38.12435,
-            "longtitude": 37.12345
-        },
+            "babyname": "ofek", 
+            "babyid": "71933006-db61-4c41-bfaa-d374279efb65", 
+            "lastupdate": "2023-08-11T20:20:23.806746", 
+            "details": "{\"location\": \"SOME LOCATION STRING\", \"temprature\": 25.5, \"humidity\": 50.0}"
+        }
         {
-            "babyname": "ofek",
-            "babyid": "asdasas",
-            "lastupdate": null,
-            "latitude": null,
-            "longtitude": null
+            "babyname": "nitzan", 
+            "babyid": "7de3fab7-0d49-43b3-9eae-c2ae07ef3439", 
+            "lastupdate": null, 
+            "details": null
         }
     ]
 }
 ```
 
-The null fields in sivan's last update is in case the baby was added, but an update was never sent.
+The null fields in nitzan's last update is in case the baby was added, but an update was never sent.
 
 #### serveralert
 

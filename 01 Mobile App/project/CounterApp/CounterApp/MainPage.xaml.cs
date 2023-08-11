@@ -59,8 +59,7 @@ namespace CounterApp
                     new Label {Style=Device.Styles.BodyStyle, Text = "last update: " + tappedBaby.lastupdate},
                     new Label {Style=Device.Styles.BodyStyle, Text = "temprature: " + tappedBaby.temperature },
                     new Label {Style=Device.Styles.BodyStyle, Text = "humidity: " + tappedBaby.humidity},
-                    new Label {Style=Device.Styles.BodyStyle, Text = "latitude: " + tappedBaby.latitude},
-                    new Label {Style=Device.Styles.BodyStyle, Text = "longtitude: " + tappedBaby.longtitude}
+                    new Label {Style=Device.Styles.BodyStyle, Text = "location: " + tappedBaby.location},
                 }}
             };
             App.Current.MainPage.Navigation.ShowPopup(popup);
