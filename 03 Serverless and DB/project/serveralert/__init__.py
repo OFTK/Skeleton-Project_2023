@@ -32,7 +32,7 @@ def main(mytimer: func.TimerRequest, signalRMessages: func.Out[str]) -> None:
     # base_url = "http://localhost:7170"
     base_url = "https://ilovemybaby.azurewebsites.net"
     getfamilystatus_url = base_url + "/api/getfamilystatus"
-    family_status = request_getfamilystatus(family, getfamilystatus_url)('status')
+    family_status = request_getfamilystatus(family, getfamilystatus_url)
 
     # create a data structure of all babies that are in danger
     # example alert_list:
@@ -49,7 +49,7 @@ def main(mytimer: func.TimerRequest, signalRMessages: func.Out[str]) -> None:
     #     }
     # ]
     alert_list = []
-    for baby in family_status:
+    for baby in family_status.get("status"):
         reason = alert_condition(baby)
         if reason: # return string isn't null
             alert = {}
@@ -59,6 +59,7 @@ def main(mytimer: func.TimerRequest, signalRMessages: func.Out[str]) -> None:
         alert_list.append(alert)
 
     # send signalr to all of the family members
+    logging.info('sending signalr message with contents: %s', alert_list)
     signalRMessages.set(json.dumps({
         'target': 'babyalert',
         'arguments': [

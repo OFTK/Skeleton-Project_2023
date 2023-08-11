@@ -65,6 +65,24 @@ no requirements for the header, by the body needs to contain a json of the follo
     }
 ```
 
+#### babytagupdate
+
+POST request
+no requirements for the header, by the body needs to contain a json of the following structure:
+
+```json
+{
+        "babyid": "7de3fab7-0d49-43b3-9eae-c2ae07ef3439",
+        "details": 
+        {
+            "temprature": 25.5,
+            "humidity": 50.0
+        }
+    }
+```
+
+the function returns 200 OK if the operation succedded, 400 if the input structure is bad (with a reason in the body), and 500 for some internal server error.
+
 #### getfamilystatus
 
 GET request
