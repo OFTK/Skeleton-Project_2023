@@ -169,8 +169,8 @@ namespace CounterApp
                 for (int i = 0; i < FamilyStatusDisplay.status.Count; i++)
                 {
                     Status baby = FamilyStatusDisplay.status[i];
-                    BabyStatus result = scanner.BLEScan(baby.babyid, "", "", "").Result;
-                    if (result._BabyTemp != null)
+                    BabyStatus result = scanner.BLEScan(baby.babyid).Result;
+                    if (result != null && result._BabyTemp != null)
                     {
                         DisplayMessage = "Temperature: " + result._BabyTemp.ToString() + "\nHumidity: " + result._BabyHumd.ToString() + "\n, Time: " + result._BabyLastSeenTime.ToString();
                         UpdateServer(result, baby);

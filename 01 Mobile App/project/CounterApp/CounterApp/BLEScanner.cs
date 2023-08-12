@@ -22,7 +22,6 @@ namespace CounterApp
         private readonly string SYNC_CHAR_UUID = "3b4fa77b-bb0b-4b12-8ee6-913382a4f2a0";
         private readonly string WIFI_SSID_CHAR_UUID = "28919cc6-36d5-11ee-be56-0242ac120002";
         private readonly string WIFI_PASS_CHAR_UUID = "02350feb-8302-4ff7-8f04-9e07f69d73df";
-        private readonly string WIFI_URL_CHAR_UUID = "c2ee89bb-e8e5-4247-be7b-d23726656389";
 
         // Baby Status
 
@@ -111,145 +110,153 @@ namespace CounterApp
             bool got_sync = false;
             // ----------------------------------------
 
-            // initialize bluetooth adapter
-            if (!_bluetoothAdapter.IsScanning)                                                             // Make sure that the Bluetooth adapter is scanning for devices
-            {
-                await _bluetoothAdapter.StartScanningForDevicesAsync();
-            }
-
-            // initialize status object (that we would return eventually)
-            var status = new MainViewModel.BabyStatus();
-
-            // scan all devices around
-            foreach (IDevice device in _bluetoothAdapter.ConnectedDevices)                                // Make sure BLE devices are added to the _gattDevices list
-                _gattDevices.Add(device);
-
-            foreach (IDevice device in _gattDevices)                                                      // Make sure BLE devices are added to the _gattDevices list
+            try 
             {
 
-                // connect to device that has a name TINOKEBLE
-                if (device.Name.Equals("TINOKIBLE"))
+                // initialize bluetooth adapter
+                if (!_bluetoothAdapter.IsScanning)                                                             // Make sure that the Bluetooth adapter is scanning for devices
                 {
-                    // connect to device if disconnected
-                    if (device.State != DeviceState.Connected)                                            // Check first if we are already connected to the BLE Device 
+                    await _bluetoothAdapter.StartScanningForDevicesAsync();
+                }
+
+                // initialize status object (that we would return eventually)
+                var status = new MainViewModel.BabyStatus();
+
+                // scan all devices around
+                foreach (IDevice device in _bluetoothAdapter.ConnectedDevices)                                // Make sure BLE devices are added to the _gattDevices list
+                    _gattDevices.Add(device);
+
+                foreach (IDevice device in _gattDevices)                                                      // Make sure BLE devices are added to the _gattDevices list
+                {
+
+                    // connect to device that has a name TINOKEBLE
+                    if (device.Name.Equals("TINOKIBLE"))
                     {
-                        try
+                        // connect to device if disconnected
+                        if (device.State != DeviceState.Connected)                                            // Check first if we are already connected to the BLE Device 
                         {
-                            var connectParameters = new ConnectParameters(false, true);
-                            await _bluetoothAdapter.ConnectToDeviceAsync(device, connectParameters);          // if we are not connected, then try to connect to the BLE Device selected
-                        }
-                        catch
-                        {
-                            await Application.Current.MainPage.DisplayAlert("Error connecting", $"Error connecting to BLE device: {device.Name ?? "N/A"}", "Retry");       // give an error message if it is not possible to connect
-                            continue;
-                        }
-                    }
-
-                    // check all services
-                    var servicesListReadOnly = await device.GetServicesAsync();           // Read in the Services available
-                    IService TINOKI_Service = null;
-
-                    foreach (IService service in servicesListReadOnly)
-                    {
-                        if (service.Id.ToString() == ble_uuid)
-                        {
-                            TINOKI_Service = service;
-                            break;
-                        }
-                    }
-
-                    // read services only if the device has the required uuid
-                    if (TINOKI_Service == null)
-                        await _bluetoothAdapter.DisconnectDeviceAsync(device);
-                    else
-                    {
-                        var charListReadOnly = await TINOKI_Service.GetCharacteristicsAsync();       // Read in available Characteristics
-
-                        foreach (ICharacteristic character in charListReadOnly) // Reading humidity and temperature
-                        {
-                            if (character.Uuid.ToString() == TEMP_CHAR_UUID)
+                            try
                             {
-                                if (character.CanRead)
-                                {
-                                    byte[] receivedBytes = await character.ReadAsync();
-
-                                    if (receivedBytes != null)
-                                        status._BabyTemp = BitConverter.ToSingle(receivedBytes, 0);
-                                }
-
-                                status._BabyLastSeenTime = DateTime.Now;
+                                var connectParameters = new ConnectParameters(false, true);
+                                await _bluetoothAdapter.ConnectToDeviceAsync(device, connectParameters);          // if we are not connected, then try to connect to the BLE Device selected
                             }
-                            else if (character.Uuid.ToString() == HUMD_CHAR_UUID)
+                            catch
                             {
-                                if (character.CanRead)
-                                {
-                                    byte[] receivedBytes = await character.ReadAsync();
-
-                                    if (receivedBytes != null)
-                                        status._BabyHumd = BitConverter.ToSingle(receivedBytes, 0);
-                                }
+                                await Application.Current.MainPage.DisplayAlert("Error connecting", $"Error connecting to BLE device: {device.Name ?? "N/A"}", "Retry");       // give an error message if it is not possible to connect
+                                continue;
                             }
-                            else if (wifi_ssid != null && character.Uuid.ToString() == SYNC_CHAR_UUID)
-                            {
-                                if (character.CanRead)
-                                {
-                                    aes_sync = await character.ReadAsync();
+                        }
 
-                                    if (aes_sync.Length * 8 != aes.BlockSize)
+                        // check all services
+                        var servicesListReadOnly = await device.GetServicesAsync();           // Read in the Services available
+                        IService TINOKI_Service = null;
+
+                        foreach (IService service in servicesListReadOnly)
+                        {
+                            if (service.Id.ToString() == ble_uuid)
+                            {
+                                TINOKI_Service = service;
+                                break;
+                            }
+                        }
+
+                        // read services only if the device has the required uuid
+                        if (TINOKI_Service == null)
+                            await _bluetoothAdapter.DisconnectDeviceAsync(device);
+                        else
+                        {
+                            var charListReadOnly = await TINOKI_Service.GetCharacteristicsAsync();       // Read in available Characteristics
+
+                            foreach (ICharacteristic character in charListReadOnly) // Reading humidity and temperature
+                            {
+                                if (character.Uuid.ToString() == TEMP_CHAR_UUID)
+                                {
+                                    if (character.CanRead)
                                     {
-                                        Console.WriteLine("Received bad sync of size " + aes_sync.Length.ToString() + ", need to be: " + aes.BlockSize / 8);
-                                        for (int i = 0; i < aes_sync.Length; i++)
+                                        byte[] receivedBytes = await character.ReadAsync();
+
+                                        if (receivedBytes != null)
+                                            status._BabyTemp = BitConverter.ToSingle(receivedBytes, 0);
+                                    }
+
+                                    status._BabyLastSeenTime = DateTime.Now;
+                                }
+                                else if (character.Uuid.ToString() == HUMD_CHAR_UUID)
+                                {
+                                    if (character.CanRead)
+                                    {
+                                        byte[] receivedBytes = await character.ReadAsync();
+
+                                        if (receivedBytes != null)
+                                            status._BabyHumd = BitConverter.ToSingle(receivedBytes, 0);
+                                    }
+                                }
+                                else if (wifi_ssid != null && character.Uuid.ToString() == SYNC_CHAR_UUID)
+                                {
+                                    if (character.CanRead)
+                                    {
+                                        aes_sync = await character.ReadAsync();
+
+                                        if (aes_sync.Length * 8 != aes.BlockSize)
                                         {
-                                            if (i > 0) Console.Write((":"));
-                                            Console.Write("{0:X}", aes_sync[i]);
+                                            Console.WriteLine("Received bad sync of size " + aes_sync.Length.ToString() + ", need to be: " + aes.BlockSize / 8);
+                                            for (int i = 0; i < aes_sync.Length; i++)
+                                            {
+                                                if (i > 0) Console.Write((":"));
+                                                Console.Write("{0:X}", aes_sync[i]);
+                                            }
+                                            Console.WriteLine("");
                                         }
-                                        Console.WriteLine("");
-                                    }
-                                    else
-                                    {
-                                        // Set up the algorithm
-                                        aes.Padding = PaddingMode.PKCS7;
-                                        aes.Mode = CipherMode.CBC;
-                                        aes.Key = aes_key;
-                                        aes.IV = aes_sync;
-                                        got_sync = true;
+                                        else
+                                        {
+                                            // Set up the algorithm
+                                            aes.Padding = PaddingMode.PKCS7;
+                                            aes.Mode = CipherMode.CBC;
+                                            aes.Key = aes_key;
+                                            aes.IV = aes_sync;
+                                            got_sync = true;
+                                        }
                                     }
                                 }
-                            }
-                            else if (wifi_ssid != null && character.Uuid.ToString() == WIFI_SSID_CHAR_UUID)
-                            {
-                                if (character.CanRead && character.CanWrite && got_sync)
+                                else if (wifi_ssid != null && character.Uuid.ToString() == WIFI_SSID_CHAR_UUID)
                                 {
-                                    // First, we check if the IOT device is connected to the network we want it to be connected to
-                                    byte[] receivedBytes = await character.ReadAsync();
+                                    if (character.CanRead && character.CanWrite && got_sync)
+                                    {
+                                        // First, we check if the IOT device is connected to the network we want it to be connected to
+                                        byte[] receivedBytes = await character.ReadAsync();
 
-                                    if (wifi_ssid.Equals(Encoding.ASCII.GetString(receivedBytes)))
-                                    {
-                                        dev_got_wifi_creds = true;
-                                    }
-                                    else
-                                    {
-                                        dev_got_wifi_creds = false;
-                                        byte[] b_wifi_ssid = string_to_byte_arr(wifi_ssid);
-                                        await character.WriteAsync(b_wifi_ssid);
+                                        if (wifi_ssid.Equals(Encoding.ASCII.GetString(receivedBytes)))
+                                        {
+                                            dev_got_wifi_creds = true;
+                                        }
+                                        else
+                                        {
+                                            dev_got_wifi_creds = false;
+                                            byte[] b_wifi_ssid = string_to_byte_arr(wifi_ssid);
+                                            await character.WriteAsync(b_wifi_ssid);
+                                        }
                                     }
                                 }
-                            }
-                            else if (wifi_pass != null && character.Uuid.ToString() == WIFI_PASS_CHAR_UUID)
-                            {
-                                if (character.CanWrite && got_sync && !dev_got_wifi_creds)
+                                else if (wifi_pass != null && character.Uuid.ToString() == WIFI_PASS_CHAR_UUID)
                                 {
-                                    byte[] b_wifi_pass = string_to_byte_arr(wifi_pass, true);
-                                    await character.WriteAsync(b_wifi_pass);
+                                    if (character.CanWrite && got_sync && !dev_got_wifi_creds)
+                                    {
+                                        byte[] b_wifi_pass = string_to_byte_arr(wifi_pass, true);
+                                        await character.WriteAsync(b_wifi_pass);
+                                    }
                                 }
                             }
                         }
                     }
                 }
+                return status;
+            } catch {
 
             }
 
-            return status;
+            
+
+            return null;
 
         }
 

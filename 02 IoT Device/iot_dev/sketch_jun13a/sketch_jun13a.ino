@@ -38,15 +38,17 @@ float humidity = 0;
 
 // Wifi globals
 
-bool has_wifi_creds = false;
+bool has_wifi_creds = true;
 
 #define MAX_SSID_LEN 50
 #define MAX_PASS_LEN 50
 
-char ssid[MAX_SSID_LEN + 1] = {0};
-char pass[MAX_PASS_LEN + 1] = {0};
+// char ssid[MAX_SSID_LEN + 1] = {0};
+// char pass[MAX_PASS_LEN + 1] = {0};
+char ssid[MAX_SSID_LEN + 1] = "Home";
+char pass[MAX_PASS_LEN + 1] = "097452430";
 
-const char azure_details_func_url[] = "https://ilovemybaby.azurewebsites.net/api/updatebabystatus";
+const char azure_details_func_url[] = "https://ilovemybaby.azurewebsites.net/api/babytagupdate";
 
 BLECharacteristic *pWifiSSIDChar;
 
@@ -267,17 +269,23 @@ void loop()
       
       // Data to send with HTTP POST
       sprintf(sens_data_str,
-              "{details:{\"temprature\":\"%.2f\",\"humidity\":\"%.2f\"}}",
+      "{'babyid': '%s', 'details': {'temprature': %.2f, 'humidity': %.2f}}",
+              SERVICE_UUID,
               mySensor.readTempC(),
-              mySensor.readFloatHumidity() 
+              mySensor.readFloatHumidity()
               );
+
+      Serial.println(sens_data_str);
 
       // Send HTTP POST request
       int httpResponseCode = http.POST(sens_data_str);
+      Serial.println(http.getString());
+      sprintf(buff, "Resp from server: %d\0", httpResponseCode);
+      Serial.println(buff);
 
       http.end();
     }
   }
 
-  delay(6000); // TODO : When everything works, run this every half a minute
+  delay(600); // TODO : When everything works, run this every half a minute
 }
