@@ -50,7 +50,9 @@ const Admin = () => {
     return (
         <Container maxWidth="md" style={{ marginTop: '20px' }}>
             <Typography variant="h4" gutterBottom>
-                Administraion Page for System Administrators-
+                Administraion Page for System Administrators
+                </Typography>
+                <Typography variant="h5" gutterBottom>
                 Family Status for {familyName} Family
             </Typography>
             {familyStatus.map(status => (
