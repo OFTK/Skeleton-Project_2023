@@ -37,19 +37,19 @@ namespace CounterApp
             WIFI_OPS_URL = 2
         };
 
-        private int get_block_size(int len)
+        private int get_dword_size(int len)
         {
-            if (len % aes.BlockSize != 0)
+            if (len % 4 != 0)
             {
-                len = ((len / aes.BlockSize) + 1) * aes.BlockSize;
+                len = ((len / 4) + 1) * 4;
             }
 
             return len;
         }
 
-        private byte[] EncryptString(string plainText, ref byte[] o_buff, int index)
+        private byte[] EncryptString(string plainText)
         {
-            byte[] array = new byte[plainText.Length];
+            byte[] array;
 
             ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
             using (MemoryStream memoryStream = new MemoryStream())
@@ -64,34 +64,71 @@ namespace CounterApp
                 }
             }
 
-            Console.WriteLine("Arr len:" + array.Length + "PLTXT len:" + plainText.Length + "o_buff len:" + o_buff.Length + "i:" + index.ToString());
-
-            for (int i = 0; i < array.Length; i++)
-            {
-                Console.WriteLine("o_buff[" + (i + index).ToString() + "], buff[" + i.ToString() + "] = {0:X}", array[i]);
-                o_buff[i + index] = array[i];
-            }
-
-            Console.WriteLine("Got to here!");
-
             return array;
         }
 
-        private void string_to_byte_arr(string str, ref byte[] byte_arr, int offset, bool encrypt = false)
+        // @note: Pads with zeroes to dwords
+        private byte[] string_to_byte_arr(string str, bool encrypt = false)
         {
             if (encrypt)
             {
-                Console.WriteLine("Got to here! bla");
-                EncryptString(str, ref byte_arr, offset);
-                Console.WriteLine("Got to here! blo");
-                Console.WriteLine(byte_arr);
+                return EncryptString(str);
             }
             else
             {
-                for (int i = offset; i < str.Length + 1; i++)
+                byte[] arr = new byte[get_dword_size(str.Length)];
+
+                int i;
+
+                for (i = 0; i < str.Length; i++)
                 {
-                    byte_arr[i] = Convert.ToByte(str[i - offset]);
+                    arr[i] = Convert.ToByte(str[i]);
                 }
+
+                for (; i < arr.Length; i++)
+                {
+                    arr[i] = 0;
+                }
+
+                return arr;
+            }
+        }
+
+        /**
+         * This protocol works as follows (it is asynchronous):
+         * - Sends op
+         * - Sends length (in bytes, as a byte)
+         * - Sends buffer (a dword on every write)
+         * 
+         * This handles a couple of problems...
+         * @note: This procedure works for small strs only (less than 256 in length), padds with zeroes if needed.
+         */
+        private async void dev_wifi_protocol(string str, WIFI_OPS op, ICharacteristic character, bool encrypt = false)
+        {
+            // Sends op
+            byte[] _op = new byte[1];
+            _op[0] = (byte)op;
+            await character.WriteAsync((_op));
+            /*
+            await MainThread.InvokeOnMainThreadAsync(async () => 
+            await character.WriteAsync((_op))
+            );*/
+
+            System.Threading.Thread.Sleep(100);
+            byte[] data = string_to_byte_arr(str, encrypt);
+
+            // Sends Length
+            byte[] _len = new byte[1];
+            _len[0] = (byte)data.Length;
+            await character.WriteAsync((_len));
+            System.Threading.Thread.Sleep(100);
+
+            // Sends data
+            for (int i = 0; (i < data.Length); i += 4)
+            {
+                ArraySegment<byte> _dword = new ArraySegment<byte>(data, i, 4);
+                await character.WriteAsync((_dword.Array));
+                System.Threading.Thread.Sleep(100);
             }
         }
 
@@ -100,7 +137,6 @@ namespace CounterApp
                                                             string wifi_pass = null,
                                                             string wifi_url = null)
         {
-
             // TODO : This is debug! Do the real thing!
             wifi_ssid = "Home";
             wifi_pass = "097452430";
@@ -227,24 +263,10 @@ namespace CounterApp
                                     if (receivedBytes == null || !wifi_ssid.Equals(Encoding.ASCII.GetString(receivedBytes)))
                                     { // If it is not, sending the wifi creds
 
-                                        Console.WriteLine("ssid:" + wifi_ssid.Length + ", pass: " + wifi_pass.Length + ", url: " + wifi_url.Length);
-
-                                        // Converting strings to byte arrays
-                                        byte[] b_wifi_ssid = new byte[wifi_ssid.Length + 1];
-                                        b_wifi_ssid[0] = (byte)WIFI_OPS.WIFI_OPS_SSID;
-                                        string_to_byte_arr(wifi_ssid, ref b_wifi_ssid, 1);
-
-                                        byte[] b_wifi_pass = new byte[get_block_size(wifi_pass.Length) + 1];
-                                        b_wifi_pass[0] = (byte)WIFI_OPS.WIFI_OPS_PASS;
-                                        string_to_byte_arr(wifi_pass, ref b_wifi_pass, 1, true);
-
-                                        byte[] b_wifi_url = new byte[wifi_url.Length + 1];
-                                        b_wifi_url[0] = (byte)WIFI_OPS.WIFI_OPS_URL;
-                                        string_to_byte_arr(wifi_url, ref b_wifi_url, 1);
-
-                                        await character.WriteAsync(b_wifi_ssid);
-                                        await character.WriteAsync(b_wifi_pass);
-                                        await character.WriteAsync(b_wifi_url);
+                                        // Writes using a protocol that the device accepts
+                                        await MainThread.InvokeOnMainThreadAsync(async () => dev_wifi_protocol(wifi_ssid, WIFI_OPS.WIFI_OPS_SSID, character));
+                                        await MainThread.InvokeOnMainThreadAsync(async () => dev_wifi_protocol(wifi_pass, WIFI_OPS.WIFI_OPS_PASS, character, true));
+                                        await MainThread.InvokeOnMainThreadAsync(async () => dev_wifi_protocol(wifi_ssid, WIFI_OPS.WIFI_OPS_URL, character));
                                     }
                                 }
                             }
