@@ -19,8 +19,10 @@ namespace CounterApp
     {
         private readonly string TEMP_CHAR_UUID = "f96c20eb-05c7-4c31-803b-03428eae9aa2";
         private readonly string HUMD_CHAR_UUID = "2d4fa781-cf1c-4ea1-9427-14951f794d80";
-        private readonly string WIFI_CHAR_UUID = "28919cc6-36d5-11ee-be56-0242ac120002";
         private readonly string SYNC_CHAR_UUID = "3b4fa77b-bb0b-4b12-8ee6-913382a4f2a0";
+        private readonly string WIFI_SSID_CHAR_UUID = "28919cc6-36d5-11ee-be56-0242ac120002";
+        private readonly string WIFI_PASS_CHAR_UUID = "02350feb-8302-4ff7-8f04-9e07f69d73df";
+        private readonly string WIFI_URL_CHAR_UUID = "c2ee89bb-e8e5-4247-be7b-d23726656389";
 
         // Baby Status
 
@@ -28,6 +30,7 @@ namespace CounterApp
         private readonly List<IDevice> _gattDevices = new List<IDevice>();      // Empty list to store BLE devices that can be detected by the Bluetooth adapter
 
         private Aes aes = AesManaged.Create();
+        bool dev_got_wifi_creds = false;
 
         // Wifi ops enum
         enum WIFI_OPS
@@ -94,53 +97,13 @@ namespace CounterApp
             }
         }
 
-        /**
-         * This protocol works as follows (it is asynchronous):
-         * - Sends op
-         * - Sends length (in bytes, as a byte)
-         * - Sends buffer (a dword on every write)
-         * 
-         * This handles a couple of problems...
-         * @note: This procedure works for small strs only (less than 256 in length), padds with zeroes if needed.
-         */
-        private async void dev_wifi_protocol(string str, WIFI_OPS op, ICharacteristic character, bool encrypt = false)
-        {
-            // Sends op
-            byte[] _op = new byte[1];
-            _op[0] = (byte)op;
-            await character.WriteAsync((_op));
-            /*
-            await MainThread.InvokeOnMainThreadAsync(async () => 
-            await character.WriteAsync((_op))
-            );*/
-
-            System.Threading.Thread.Sleep(100);
-            byte[] data = string_to_byte_arr(str, encrypt);
-
-            // Sends Length
-            byte[] _len = new byte[1];
-            _len[0] = (byte)data.Length;
-            await character.WriteAsync((_len));
-            System.Threading.Thread.Sleep(100);
-
-            // Sends data
-            for (int i = 0; (i < data.Length); i += 4)
-            {
-                ArraySegment<byte> _dword = new ArraySegment<byte>(data, i, 4);
-                await character.WriteAsync((_dword.Array));
-                System.Threading.Thread.Sleep(100);
-            }
-        }
-
         public async Task<MainViewModel.BabyStatus> BLEScan(string ble_uuid,
                                                             string wifi_ssid = null,
-                                                            string wifi_pass = null,
-                                                            string wifi_url = null)
+                                                            string wifi_pass = null)
         {
             // TODO : This is debug! Do the real thing!
             wifi_ssid = "Home";
             wifi_pass = "097452430";
-            wifi_url = "https://ilovemybaby.azurewebsites.net/api/updatebabystatus?";
             // ----------------------------------------
             // TODO : Get the key from cloud
             byte[] aes_key = new byte[16] { 0xa1, 0x95, 0x1f, 0x50, 0xe5, 0x66, 0x8b, 0xb7, 0x23, 0xd4, 0xfa, 0x8a, 0xb3, 0x5a, 0xef, 0x14 }; // Constant for every iot dev
@@ -253,21 +216,31 @@ namespace CounterApp
                                     }
                                 }
                             }
-                            else if (wifi_ssid != null && character.Uuid.ToString() == WIFI_CHAR_UUID)
+                            else if (wifi_ssid != null && character.Uuid.ToString() == WIFI_SSID_CHAR_UUID)
                             {
                                 if (character.CanRead && character.CanWrite && got_sync)
                                 {
                                     // First, we check if the IOT device is connected to the network we want it to be connected to
                                     byte[] receivedBytes = await character.ReadAsync();
 
-                                    if (receivedBytes == null || !wifi_ssid.Equals(Encoding.ASCII.GetString(receivedBytes)))
-                                    { // If it is not, sending the wifi creds
-
-                                        // Writes using a protocol that the device accepts
-                                        await MainThread.InvokeOnMainThreadAsync(async () => dev_wifi_protocol(wifi_ssid, WIFI_OPS.WIFI_OPS_SSID, character));
-                                        await MainThread.InvokeOnMainThreadAsync(async () => dev_wifi_protocol(wifi_pass, WIFI_OPS.WIFI_OPS_PASS, character, true));
-                                        await MainThread.InvokeOnMainThreadAsync(async () => dev_wifi_protocol(wifi_ssid, WIFI_OPS.WIFI_OPS_URL, character));
+                                    if (wifi_ssid.Equals(Encoding.ASCII.GetString(receivedBytes)))
+                                    {
+                                        dev_got_wifi_creds = true;
                                     }
+                                    else
+                                    {
+                                        dev_got_wifi_creds = false;
+                                        byte[] b_wifi_ssid = string_to_byte_arr(wifi_ssid);
+                                        await character.WriteAsync(b_wifi_ssid);
+                                    }
+                                }
+                            }
+                            else if (wifi_pass != null && character.Uuid.ToString() == WIFI_PASS_CHAR_UUID)
+                            {
+                                if (character.CanWrite && got_sync && !dev_got_wifi_creds)
+                                {
+                                    byte[] b_wifi_pass = string_to_byte_arr(wifi_pass, true);
+                                    await character.WriteAsync(b_wifi_pass);
                                 }
                             }
                         }
