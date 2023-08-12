@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Box, Container, Typography, TextField, Button } from '@mui/material';
+import SignalRNotifications from './SignalRNotifications'; // Make sure to provide the correct path
 
 function User() {
     const [familyStatus, setFamilyStatus] = useState([]);
@@ -10,7 +11,7 @@ function User() {
 
     useEffect(() => {
         fetchFamilyStatus();
-    }); //[]
+    }, []);
 
     const fetchFamilyStatus = () => {
         axios
@@ -64,7 +65,6 @@ function User() {
                     variant="outlined"
                     margin="dense" />
 
-
                 <TextField
                     label="Baby Name"
                     value={newBabyName}
@@ -74,10 +74,13 @@ function User() {
                 <Button variant="contained" color="primary" onClick={handleAddBaby}>
                     Add new Baby
                 </Button>
-
             </Box>
+            <SignalRNotifications /> {
+            /*SignalRNotifications component */
+            
+            }
         </Container>
     );
 }
-  
-  export default User;
+
+export default User;
