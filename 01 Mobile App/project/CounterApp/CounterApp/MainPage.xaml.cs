@@ -40,8 +40,6 @@ namespace CounterApp
                 if (!Navigation.ModalStack.Any())
                     await Navigation.PushModalAsync(new LoginPage(), false);
             }
-
-            ((MainViewModel)this.BindingContext).OnAppearing();
         }
 
         private async Task<bool> PermissionsGrantedAsync()      // Function to make sure that all the appropriate approvals are in place

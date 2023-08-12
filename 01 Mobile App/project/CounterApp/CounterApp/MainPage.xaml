@@ -22,6 +22,7 @@
             </ListView.ItemTemplate>
         </ListView>
 
+        <Button Text="Start Monitoring" Command="{Binding StartViewModelCommand}" TextColor="White" BackgroundColor="DarkSlateBlue" IsVisible="{Binding ViewModelNotStarted}"/>
         <Label Text="{Binding DisplayMessage, StringFormat='{0}'}" TextColor="Black" FontSize="Small"/>
         <Label Text="{Binding DisplayMessage2, StringFormat='{0}'}" TextColor="Black" FontSize="Small"/>
     </StackLayout>
