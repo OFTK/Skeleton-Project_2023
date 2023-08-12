@@ -30,6 +30,7 @@ namespace CounterApp.Services
 
         public async Task<bool> Authenticate()
         {
+            // return true;
             if (IsLoggedIn())
                 return true;
 

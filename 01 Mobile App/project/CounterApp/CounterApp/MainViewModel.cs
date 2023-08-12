@@ -44,7 +44,13 @@ namespace CounterApp
 
         // fields
         /////////
-        
+        public string _ViewModelNotStarted = "true";
+        public string ViewModelNotStarted { 
+            get => _ViewModelNotStarted;
+            set => SetProperty(ref _ViewModelNotStarted, value);
+        }
+        public ICommand StartViewModelCommand { get; }
+
         // connection and display
         public HubConnection connection;
         // private static readonly string baseUrl = "https://skeletonfunctionapp.azurewebsites.net";
@@ -381,6 +387,8 @@ namespace CounterApp
             // update_nearby_baby_to_server_thread.Start();
             // client.Dispose();
 
+            StartViewModelCommand = new Command(async () => await StartViewModel());
+
             LocalFamilyDetails = new FamilyDetails();
             LocalFamilyDetails.details = new List<BabyDetails>();
             LocalFamilyDetails.family = "";
@@ -389,11 +397,12 @@ namespace CounterApp
         }
 
         // get family details and connect to signalr on main page appear
-        public void OnAppearing()
+        public Task StartViewModel()
         {
             var azureService = DependencyService.Get<IAzureService>();
 
-            if (azureService.IsLoggedIn())
+            // TODO: change the following line back to: if (azureService.IsLoggedIn())
+            if (true)
             {
                 client = new HttpClient();
                 connection = new HubConnectionBuilder().WithUrl(new Uri(baseUrl + "/api")).Build();
@@ -404,7 +413,11 @@ namespace CounterApp
                 Thread update_nearby_baby_to_server_thread = new Thread(UpdateNearbyBabyToServer) { };
                 update_nearby_baby_to_server_thread.Start();
                 client.Dispose();
+
+                // ViewModelNotStarted = "false";
             }
+
+            return Task.CompletedTask;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
