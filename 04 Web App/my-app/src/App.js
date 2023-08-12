@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Box, Container, Typography } from '@mui/material';
 
 function App() {
   const [familyStatus, setFamilyStatus] = useState([]);
@@ -19,18 +20,22 @@ function App() {
   console.log('Family Status:', familyStatus);
 
   return (
-    <div>
-      <h1> Family Status for {familyName} family </h1>
-      <ul>
+    <Container maxWidth="md" style={{ marginTop: '20px' }}>
+      <Typography variant="h4" gutterBottom>
+        Family Status for {familyName} family
+      </Typography>
+      <Box display="flex" flexDirection="column">
         {familyStatus.map(status => (
-          <li key={status.babyid}>
-            <p>Baby Name: {status.babyname}</p>
-            <p>Last Update: {status.lastupdate}</p>
-            <p>Location: ({status.latitude}, {status.longtitude})</p>
-          </li>
+          <Box key={status.babyid} border={1} p={2} marginBottom={2}>
+            <Typography variant="h6">Baby Name: {status.babyname}</Typography>
+            <Typography>Last Update: {status.lastupdate}</Typography>
+            <Typography>
+              Location: ({status.latitude}, {status.longitude})
+            </Typography>
+          </Box>
         ))}
-      </ul>
-    </div>
+      </Box>
+    </Container>
   );
 }
 
