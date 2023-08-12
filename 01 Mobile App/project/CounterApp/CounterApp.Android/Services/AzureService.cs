@@ -12,7 +12,7 @@ namespace CounterApp.Droid.Services
         {
             return Client.LoginAsync(CrossCurrentActivity.Current.Activity,
                                     MobileServiceAuthenticationProvider.WindowsAzureActiveDirectory,
-                                    "CounterApp");
+                                    "ilovemybaby");
         }
     }
 }
