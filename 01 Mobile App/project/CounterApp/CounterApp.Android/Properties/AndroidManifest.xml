@@ -9,5 +9,16 @@
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-	<application android:label="CounterApp.Android"></application>
+	<uses-permission android:name="android.permission.INTERNET" />
+	<application android:label="CounterApp.Android">
+		<activity android:name="com.microsoft.windowsazure.mobileservices.authentication.RedirectUrlActivity" android:exported="false" android:launchMode="singleTop" android:noHistory="true">
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<data android:scheme="CounterApp" android:host="easyauth.callback" />
+			</intent-filter>
+		</activity>
+	</application>
+
 </manifest>

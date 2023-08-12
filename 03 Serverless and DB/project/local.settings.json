@@ -5,10 +5,16 @@
     "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=iotworkshopb0d6;AccountKey=jotKz3BQqCMegQsAkZMpOIA0f48sicw9XnnX7UYvohDWpisGveUvwgqG/M030UXyzsKs9uwYZrej+AStGxWt4A==;EndpointSuffix=core.windows.net",
     "AzureSignalRConnectionString": "Endpoint=https://ilovemybaby.service.signalr.net;AccessKey=xRcf1pYW4HdEP3YOeMohWeg7+br2mTZpv47MQsvvKu0=;Version=1.0;",
     "NONSkeletonDev_function_app_listener_EVENTHUB": "Endpoint=sb://non-skeletondev.servicebus.windows.net/;SharedAccessKeyName=function_app_listener;SharedAccessKey=bYFaHbgLNDDbwAW3WHFXFZO+Vk12vZXKL+AEhFPOeUw=;EntityPath=skeletoneventhub",
-    "AzureWebJobs.getcounter.Disabled": "false",
-    "AzureWebJobs.negotiate.Disabled": "false",
-    "AzureWebJobs.receivemessage.Disabled": "false",
-    "AzureWebJobs.updatecounter.Disabled": "false"
+    "AzureWebJobs.getcounter.Disabled": "true",
+    "AzureWebJobs.negotiate.Disabled": "true",
+    "AzureWebJobs.receivemessage.Disabled": "true",
+    "AzureWebJobs.updatecounter.Disabled": "true",
+    "AzureWebJobs.getfamilystatus.Disabled": "true",
+    "AzureWebJobs.addbaby.Disabled": "true",
+    "AzureWebJobs.serveralerttest.Disabled": "true",
+    "AzureWebJobs.updatebabystatus.Disabled": "true",
+    "AzureWebJobs.updatebabystatussecure.Disabled": "false",
+    "AzureWebJobs.getbabystatussecure.Disabled": "false"
   },
   "Host": {
     "LocalHttpPort": 7071,
