@@ -23,6 +23,7 @@ using System.Net.Mime;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using CounterApp.Services;
 
 namespace CounterApp
 {
@@ -304,16 +305,41 @@ namespace CounterApp
         ////////////////
         public MainViewModel()
         {
-            // init objects for communication
-            client = new HttpClient();
-            connection = new HubConnectionBuilder().WithUrl(new Uri(baseUrl + "/api")).Build();
-            Task signalr_connection_task = Task.Run(async () => await ConnectToSignalr());
-            GetFamilyDetails();
-            Thread get_family_details_thread = new Thread(GetFamilyDetailsThread){};
-            get_family_details_thread.Start();
-            Thread update_nearby_baby_to_server_thread = new Thread(UpdateNearbyBabyToServer) { };
-            update_nearby_baby_to_server_thread.Start();
-            client.Dispose();
+            // // init objects for communication
+            // client = new HttpClient();
+            // connection = new HubConnectionBuilder().WithUrl(new Uri(baseUrl + "/api")).Build();
+            // Task signalr_connection_task = Task.Run(async () => await ConnectToSignalr());
+            // GetFamilyDetails();
+            // Thread get_family_details_thread = new Thread(GetFamilyDetailsThread){};
+            // get_family_details_thread.Start();
+            // Thread update_nearby_baby_to_server_thread = new Thread(UpdateNearbyBabyToServer) { };
+            // update_nearby_baby_to_server_thread.Start();
+            // client.Dispose();
+
+            LocalFamilyDetails = new FamilyDetails();
+            LocalFamilyDetails.details = new List<BabyDetails>();
+            LocalFamilyDetails.family = "";
+            DisplayMessage = "";
+            DisplayMessage2 = "";
+        }
+
+        // get family details and connect to signalr on main page appear
+        public void OnAppearing()
+        {
+            var azureService = DependencyService.Get<IAzureService>();
+
+            if (azureService.IsLoggedIn())
+            {
+                client = new HttpClient();
+                connection = new HubConnectionBuilder().WithUrl(new Uri(baseUrl + "/api")).Build();
+                Task signalr_connection_task = Task.Run(async () => await ConnectToSignalr());
+                GetFamilyDetails();
+                Thread get_family_details_thread = new Thread(GetFamilyDetailsThread) { };
+                get_family_details_thread.Start();
+                Thread update_nearby_baby_to_server_thread = new Thread(UpdateNearbyBabyToServer) { };
+                update_nearby_baby_to_server_thread.Start();
+                client.Dispose();
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
