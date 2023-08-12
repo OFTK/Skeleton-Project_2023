@@ -1,5 +1,6 @@
 #include <Wire.h>
 #include <WiFi.h>
+#include <WiFiClientSecure.h>
 #include <stdlib.h>
 #include <BLEUtils.h>
 #include <BLEDevice.h>
@@ -44,6 +45,8 @@ bool has_wifi_creds = false;
 
 char ssid[MAX_SSID_LEN + 1] = {0};
 char pass[MAX_PASS_LEN + 1] = {0};
+
+const char azure_details_func_url[] = "https://ilovemybaby.azurewebsites.net/api/updatebabystatus";
 
 BLECharacteristic *pWifiSSIDChar;
 
@@ -248,26 +251,29 @@ void loop()
       sprintf(buff, "Connected to wifi!\0");
       Serial.println(buff);
 
-      WiFiClient client;
+      WiFiClientSecure client;
       HTTPClient http;
+
+      client.setInsecure();
+
       char sens_data_str[300] = {'\0'};
-      /* http.begin(client, azure_update_sens_url);
+      http.begin(client, azure_details_func_url);
        
        // If you need Node-RED/server authentication, insert user and password below
       //http.setAuthorization("REPLACE_WITH_SERVER_USERNAME", "REPLACE_WITH_SERVER_PASSWORD");
 
       // Specify content-type header
-      http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+      http.addHeader("Content-Type", "application/json");
       
       // Data to send with HTTP POST
-      sprintf(sens_data_str, 
-              "device_id=%s&temp=%.2f&humd=%.2f\0", 
-              SERVICE_UUID, 
-              mySensor.readFloatHumidity(), 
-              mySensor.readTempC());           
+      sprintf(sens_data_str,
+              "{details:{\"temprature\":\"%.2f\",\"humidity\":\"%.2f\"}}",
+              mySensor.readTempC(),
+              mySensor.readFloatHumidity() 
+              );
 
       // Send HTTP POST request
-      int httpResponseCode = http.POST(sens_data_str);*/
+      int httpResponseCode = http.POST(sens_data_str);
 
       http.end();
     }
