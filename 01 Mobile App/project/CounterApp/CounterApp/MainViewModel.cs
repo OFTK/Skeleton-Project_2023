@@ -169,11 +169,56 @@ namespace CounterApp
                 for (int i = 0; i < FamilyStatusDisplay.status.Count; i++)
                 {
                     Status baby = FamilyStatusDisplay.status[i];
+
+                    if (scanner.dev_got_wifi_creds)
+                    {
+                        Console.WriteLine("WIFI DEV got creds!!!!!!!!!!!");
+                        Console.WriteLine("WIFI DEV got creds!!!!!!!!!!!");
+                        Console.WriteLine("WIFI DEV got creds!!!!!!!!!!!");
+                        Console.WriteLine("WIFI DEV got creds!!!!!!!!!!!");
+                        Console.WriteLine("WIFI DEV got creds!!!!!!!!!!!");
+                        Console.WriteLine("WIFI DEV got creds!!!!!!!!!!!");
+                        Console.WriteLine("WIFI DEV got creds!!!!!!!!!!!");
+                        Console.WriteLine("WIFI DEV got creds!!!!!!!!!!!");
+                        Console.WriteLine("WIFI DEV got creds!!!!!!!!!!!");
+                        //Thread.Sleep(10000); // If device got wifi, we wait 10 minutes before checking it still got wifi
+                    } else
+                    {
+                        Console.WriteLine("WIFI DEV not got creds$$$$$$$$$$$$$$$");
+                        Console.WriteLine("WIFI DEV not got creds$$$$$$$$$$$$$$$");
+                        Console.WriteLine("WIFI DEV not got creds$$$$$$$$$$$$$$$");
+                        Console.WriteLine("WIFI DEV not got creds$$$$$$$$$$$$$$$");
+                        Console.WriteLine("WIFI DEV not got creds$$$$$$$$$$$$$$$");
+                        Console.WriteLine("WIFI DEV not got creds$$$$$$$$$$$$$$$");
+                    }
+                       
                     BabyStatus result = scanner.BLEScan(baby.babyid).Result;
                     if (result != null && result._BabyTemp != null)
                     {
                         DisplayMessage = "Temperature: " + result._BabyTemp.ToString() + "\nHumidity: " + result._BabyHumd.ToString() + "\n, Time: " + result._BabyLastSeenTime.ToString();
                         UpdateServer(result, baby);
+                    } else
+                    {
+                        if (result == null)
+                        {
+                            Console.WriteLine("A");
+                            Console.WriteLine("A");
+                            Console.WriteLine("A");
+                            Console.WriteLine("A");
+
+                        } else
+                        {
+                            Console.WriteLine("b");
+                            Console.WriteLine("b");
+                            Console.WriteLine("b");
+                            Console.WriteLine("b");
+                        }
+                        Console.WriteLine("SCAN NO RESULT :(");
+                        Console.WriteLine("SCAN NO RESULT :(");
+                        Console.WriteLine("SCAN NO RESULT :(");
+                        Console.WriteLine("SCAN NO RESULT :(");
+                        Console.WriteLine("SCAN NO RESULT :(");
+                        Console.WriteLine("SCAN NO RESULT :(");
                     }
                 }
                 Thread.Sleep(1000);

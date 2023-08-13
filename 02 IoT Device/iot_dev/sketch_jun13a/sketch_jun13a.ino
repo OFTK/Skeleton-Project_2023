@@ -26,7 +26,7 @@ float humidity = 0;
 
 // Wifi globals
 
-bool has_wifi_creds = true;
+bool has_wifi_creds = false;
 
 #define MAX_SSID_LEN 50
 #define MAX_PASS_LEN 50
@@ -203,10 +203,15 @@ void loop()
 
     if (WiFi.status() != WL_CONNECTED && WiFi.status() != WL_IDLE_STATUS) { // Trying to connect
         
+        char buff[200];
+        sprintf(buff, "Not connected to wifi. trying: [%s]:[%s]\0", ssid, pass);
+        Serial.println(buff);
+
         WiFi.begin(ssid, pass);
         delay(1000);
 
-    } else if (WiFi.status() == WL_CONNECTED) { // If connected, publishing data    
+    } else if (WiFi.status() == WL_CONNECTED) { // If connected, publishing data  
+      Serial.println("Connected to wifi.\0");
       pWifiSSIDChar->setValue(ssid);
 
       WiFiClientSecure client;
@@ -237,5 +242,5 @@ void loop()
     }
   }
 
-  delay(30000); // TODO : When everything works, run this every half a minute
+  delay(1000); // TODO : When everything works, run this every half a minute
 }

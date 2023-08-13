@@ -29,25 +29,7 @@ namespace CounterApp
         private readonly List<IDevice> _gattDevices = new List<IDevice>();      // Empty list to store BLE devices that can be detected by the Bluetooth adapter
 
         private Aes aes = AesManaged.Create();
-        bool dev_got_wifi_creds = false;
-
-        // Wifi ops enum
-        enum WIFI_OPS
-        {
-            WIFI_OPS_SSID = 0,
-            WIFI_OPS_PASS = 1,
-            WIFI_OPS_URL = 2
-        };
-
-        private int get_dword_size(int len)
-        {
-            if (len % 4 != 0)
-            {
-                len = ((len / 4) + 1) * 4;
-            }
-
-            return len;
-        }
+        public bool dev_got_wifi_creds = false;
 
         private byte[] EncryptString(string plainText)
         {
@@ -78,7 +60,7 @@ namespace CounterApp
             }
             else
             {
-                byte[] arr = new byte[get_dword_size(str.Length)];
+                byte[] arr = new byte[str.Length];
 
                 int i;
 
@@ -126,12 +108,22 @@ namespace CounterApp
                 foreach (IDevice device in _bluetoothAdapter.ConnectedDevices)                                // Make sure BLE devices are added to the _gattDevices list
                     _gattDevices.Add(device);
 
+
+                Console.WriteLine("num of devs! " + _gattDevices.Count.ToString());
+                Console.WriteLine("num of devs! " + _gattDevices.Count.ToString());
+                Console.WriteLine("num of devs! " + _gattDevices.Count.ToString());
+                Console.WriteLine("num of devs! " + _gattDevices.Count.ToString());
+
                 foreach (IDevice device in _gattDevices)                                                      // Make sure BLE devices are added to the _gattDevices list
                 {
 
                     // connect to device that has a name TINOKEBLE
                     if (device.Name.Equals("TINOKIBLE"))
                     {
+                        Console.WriteLine("Found dev!");
+                        Console.WriteLine("Found dev!");
+                        Console.WriteLine("Found dev!");
+
                         // connect to device if disconnected
                         if (device.State != DeviceState.Connected)                                            // Check first if we are already connected to the BLE Device 
                         {
@@ -165,11 +157,17 @@ namespace CounterApp
                             await _bluetoothAdapter.DisconnectDeviceAsync(device);
                         else
                         {
+
+                            Console.WriteLine("Found service!");
+                            Console.WriteLine("Found service!");
+                            Console.WriteLine("Found service!");
+                            Console.WriteLine("Found service!");
+
                             var charListReadOnly = await TINOKI_Service.GetCharacteristicsAsync();       // Read in available Characteristics
 
                             foreach (ICharacteristic character in charListReadOnly) // Reading humidity and temperature
                             {
-                                if (character.Uuid.ToString() == TEMP_CHAR_UUID)
+                                if (!dev_got_wifi_creds && character.Uuid.ToString() == TEMP_CHAR_UUID)
                                 {
                                     if (character.CanRead)
                                     {
@@ -181,7 +179,7 @@ namespace CounterApp
 
                                     status._BabyLastSeenTime = DateTime.Now;
                                 }
-                                else if (character.Uuid.ToString() == HUMD_CHAR_UUID)
+                                else if (!dev_got_wifi_creds && character.Uuid.ToString() == HUMD_CHAR_UUID)
                                 {
                                     if (character.CanRead)
                                     {
@@ -191,7 +189,7 @@ namespace CounterApp
                                             status._BabyHumd = BitConverter.ToSingle(receivedBytes, 0);
                                     }
                                 }
-                                else if (wifi_ssid != null && character.Uuid.ToString() == SYNC_CHAR_UUID)
+                                else if (!dev_got_wifi_creds && wifi_ssid != null && character.Uuid.ToString() == SYNC_CHAR_UUID)
                                 {
                                     if (character.CanRead)
                                     {
@@ -218,7 +216,7 @@ namespace CounterApp
                                         }
                                     }
                                 }
-                                else if (wifi_ssid != null && character.Uuid.ToString() == WIFI_SSID_CHAR_UUID)
+                                else if (wifi_ssid != null && character.Uuid.ToString() == WIFI_SSID_CHAR_UUID) // We also check here if dev got wifi creds
                                 {
                                     if (character.CanRead && character.CanWrite && got_sync)
                                     {
@@ -227,6 +225,10 @@ namespace CounterApp
 
                                         if (wifi_ssid.Equals(Encoding.ASCII.GetString(receivedBytes)))
                                         {
+                                            Console.WriteLine("HERE FOR SOME REASON ?!");
+                                            Console.WriteLine("HERE FOR SOME REASON ?!");
+                                            Console.WriteLine("HERE FOR SOME REASON ?!");
+                                            Console.WriteLine("HERE FOR SOME REASON ?!");
                                             dev_got_wifi_creds = true;
                                         }
                                         else
@@ -237,9 +239,9 @@ namespace CounterApp
                                         }
                                     }
                                 }
-                                else if (wifi_pass != null && character.Uuid.ToString() == WIFI_PASS_CHAR_UUID)
+                                else if (!dev_got_wifi_creds && wifi_pass != null && character.Uuid.ToString() == WIFI_PASS_CHAR_UUID)
                                 {
-                                    if (character.CanWrite && got_sync && !dev_got_wifi_creds)
+                                    if (character.CanWrite && got_sync)
                                     {
                                         byte[] b_wifi_pass = string_to_byte_arr(wifi_pass, true);
                                         await character.WriteAsync(b_wifi_pass);
@@ -247,17 +249,24 @@ namespace CounterApp
                                 }
                             }
                         }
+
+                        if (dev_got_wifi_creds) {
+                            return null;
+                        } // The device does the work itself
                     }
                 }
+
+                Console.WriteLine("RETURN STATUS!");
+                Console.WriteLine("RETURN STATUS!");
+                Console.WriteLine("RETURN STATUS!");
+                Console.WriteLine("RETURN STATUS!");
+
                 return status;
             } catch {
 
             }
 
-            
-
             return null;
-
         }
 
         public BLEScanner()
@@ -269,7 +278,5 @@ namespace CounterApp
                     _gattDevices.Add(foundBleDevice.Device);
             };
         }
-
-
     }
 }
