@@ -224,6 +224,7 @@ namespace CounterApp
                 {
                     // scan 
                     BabyStatus result = scanner.BLEScan(LocalFamilyDetails.details[i].babyid).Result;
+
                     if (result != null && result._BabyTemp != null)
                     {
                         if (!scanner.dev_got_wifi_creds) // If the device has creds, he does it himself
