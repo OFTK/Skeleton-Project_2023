@@ -127,6 +127,7 @@ namespace CounterApp
 
             // send http request
             HttpClient GetClient = new HttpClient();
+            // GetClient.DefaultRequestHeaders.Add("X-ZUMO-AUTH", authToken);
             string url = geturi_builder.ToString();
             HttpResponseMessage resp = GetClient.GetAsync(url).Result;
 
@@ -151,13 +152,22 @@ namespace CounterApp
                 DateTime? lastupdate = (DateTime?)item["lastupdate"];
                 // TODO: convert from east europe time to local time
                 newbabydetails.lastupdate = lastupdate;
-                JObject babydetails = JObject.Parse((string)item["details"]);
-                newbabydetails.location = (string)babydetails["location"];
-                newbabydetails.temperature = (float?)babydetails["temperature"];
-                newbabydetails.humidity = (float?)babydetails["humidity"];
                 newbabydetails.displaystring = "Was last seen at: " + (string)item["lastupdate"];
                 newbabydetails.baby_is_ok = true;
-
+                // if babydetails is null, then put empty string in location, temperature and humidity 
+                try
+                {
+                    JObject babydetails = JObject.Parse((string)item["details"]);
+                    newbabydetails.location = (string)babydetails["location"];
+                    newbabydetails.temperature = (float?)babydetails["temperature"];
+                    newbabydetails.humidity = (float?)babydetails["humidity"];
+                }
+                catch 
+                {
+                    newbabydetails.location = "";
+                    newbabydetails.temperature = null;
+                    newbabydetails.humidity = null;
+                }
                 DisplayMessage = "Got status for " + newbabydetails.babyname;
                 updatedFamilyDetails.details.Add(newbabydetails);
             }
