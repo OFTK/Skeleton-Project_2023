@@ -33,6 +33,7 @@ bool has_wifi_creds = false;
 
 char ssid[MAX_SSID_LEN + 1] = {0};
 char pass[MAX_PASS_LEN + 1] = {0};
+char zeroes[16] = {0};
 
 const char azure_details_func_url[] = "https://ilovemybaby.azurewebsites.net/api/babytagupdate";
 
@@ -80,22 +81,31 @@ class WifiSSIDCallbacks: public BLECharacteristicCallbacks {
       memcpy(ssid, param->write.value, param->write.len);
     }
 
-    char buff[4] = {0};
-    pCharacteristic->setValue(buff);
+    pCharacteristic->setValue(zeroes);
 
     if (ssid[0] != '\0' && pass[0] != '\0') has_wifi_creds = true;
   }
 };
 
+class WifiSyncCallbacks: public BLECharacteristicCallbacks {
+    void onRead(BLECharacteristic *pCharacteristic) {
+      char aes_temp[N_BLOCK + 1];
+      memcpy(aes_temp, aes_sync, N_BLOCK);
+      aes_temp[N_BLOCK] = '\0';
+
+      pCharacteristic->setValue(aes_temp);
+    }
+};
+
 class WifiPassCallbacks: public BLECharacteristicCallbacks {
   virtual void onWrite(BLECharacteristic* pCharacteristic, esp_ble_gatts_cb_param_t* param)
   {
-    char buff[40] = {0};
-
     // Encrypted, decrypt and copy...
     if (param->write.len <= MAX_PASS_LEN) {
       uint16_t i = aes.decrypt(param->write.value, param->write.len, (byte*)pass, aes_key, 128, aes_sync);
-
+      
+      aes_init()
+      
       for (; i < param->write.len; i++) {
         pass[i] = '\0';
       }
@@ -115,7 +125,7 @@ void wifi_disconnected(WiFiEvent_t event, WiFiEventInfo_t info) { // On disconne
 void aes_init() {
   // Generating random sync
   esp_fill_random(aes_sync, N_BLOCK);
-  for (int i=0; i < N_BLOCK;i++) if (aes_sync[i] == 0) aes_sync[i] = 1; // We use it after as a string
+  for (int i=0; i < N_BLOCK; i++) if (aes_sync[i] == 0) aes_sync[i] = 1; // We use it after as a string
   aes.set_paddingmode(paddingMode::CMS);
 }
 
@@ -160,6 +170,8 @@ void setup()
   char aes_temp[N_BLOCK + 1];
   memcpy(aes_temp, aes_sync, N_BLOCK);
   aes_temp[N_BLOCK] = '\0';
+
+  pCharacteristic->setCallbacks(new WifiSyncCallbacks());
   pCharacteristic->setValue(aes_temp);
 
   // Setting points to get wifi creds from
@@ -242,5 +254,5 @@ void loop()
     }
   }
 
-  delay(1000); // TODO : When everything works, run this every half a minute
+  delay(30000); // TODO : When everything works, run this every half a minute
 }

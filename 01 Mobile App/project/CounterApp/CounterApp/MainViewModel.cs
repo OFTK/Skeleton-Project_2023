@@ -42,6 +42,10 @@ namespace CounterApp
 
         // attributs to display baby status
         static string family = "family";
+
+        // Attributes of IoT device wifi ssid
+        static string device_ssid = "";
+
         public class FamilyStatus
         {
             public string family { get; set; }
@@ -163,64 +167,32 @@ namespace CounterApp
 
         public void UpdateThread()
         {
+
             while (true)
             {
                 var scanner = new BLEScanner();
+
                 for (int i = 0; i < FamilyStatusDisplay.status.Count; i++)
                 {
                     Status baby = FamilyStatusDisplay.status[i];
-
-                    if (scanner.dev_got_wifi_creds)
-                    {
-                        Console.WriteLine("WIFI DEV got creds!!!!!!!!!!!");
-                        Console.WriteLine("WIFI DEV got creds!!!!!!!!!!!");
-                        Console.WriteLine("WIFI DEV got creds!!!!!!!!!!!");
-                        Console.WriteLine("WIFI DEV got creds!!!!!!!!!!!");
-                        Console.WriteLine("WIFI DEV got creds!!!!!!!!!!!");
-                        Console.WriteLine("WIFI DEV got creds!!!!!!!!!!!");
-                        Console.WriteLine("WIFI DEV got creds!!!!!!!!!!!");
-                        Console.WriteLine("WIFI DEV got creds!!!!!!!!!!!");
-                        Console.WriteLine("WIFI DEV got creds!!!!!!!!!!!");
-                        //Thread.Sleep(10000); // If device got wifi, we wait 10 minutes before checking it still got wifi
-                    } else
-                    {
-                        Console.WriteLine("WIFI DEV not got creds$$$$$$$$$$$$$$$");
-                        Console.WriteLine("WIFI DEV not got creds$$$$$$$$$$$$$$$");
-                        Console.WriteLine("WIFI DEV not got creds$$$$$$$$$$$$$$$");
-                        Console.WriteLine("WIFI DEV not got creds$$$$$$$$$$$$$$$");
-                        Console.WriteLine("WIFI DEV not got creds$$$$$$$$$$$$$$$");
-                        Console.WriteLine("WIFI DEV not got creds$$$$$$$$$$$$$$$");
-                    }
-                       
                     BabyStatus result = scanner.BLEScan(baby.babyid).Result;
+
                     if (result != null && result._BabyTemp != null)
                     {
                         DisplayMessage = "Temperature: " + result._BabyTemp.ToString() + "\nHumidity: " + result._BabyHumd.ToString() + "\n, Time: " + result._BabyLastSeenTime.ToString();
-                        UpdateServer(result, baby);
-                    } else
-                    {
-                        if (result == null)
-                        {
-                            Console.WriteLine("A");
-                            Console.WriteLine("A");
-                            Console.WriteLine("A");
-                            Console.WriteLine("A");
 
+                        if (!scanner.dev_got_wifi_creds) // If the device has creds, he does it himself
+                        {
+                            Console.WriteLine("Device got no wifi, updating server...");
+                            UpdateServer(result, baby);
                         } else
                         {
-                            Console.WriteLine("b");
-                            Console.WriteLine("b");
-                            Console.WriteLine("b");
-                            Console.WriteLine("b");
+                            device_ssid = scanner.dev_wifi_ssid;
+                            Console.WriteLine("Device got wifi with ssid: " + device_ssid);
                         }
-                        Console.WriteLine("SCAN NO RESULT :(");
-                        Console.WriteLine("SCAN NO RESULT :(");
-                        Console.WriteLine("SCAN NO RESULT :(");
-                        Console.WriteLine("SCAN NO RESULT :(");
-                        Console.WriteLine("SCAN NO RESULT :(");
-                        Console.WriteLine("SCAN NO RESULT :(");
                     }
                 }
+
                 Thread.Sleep(1000);
             }
         }
