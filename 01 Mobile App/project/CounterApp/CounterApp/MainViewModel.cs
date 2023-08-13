@@ -43,9 +43,6 @@ namespace CounterApp
         // attributs to display baby status
         static string family = "family";
 
-        // Attributes of IoT device wifi ssid
-        static string device_ssid = "";
-
         public class FamilyStatus
         {
             public string family { get; set; }
@@ -101,6 +98,28 @@ namespace CounterApp
         {
             get => _displayMessage2;
             set => SetProperty(ref _displayMessage2, value);
+        }
+
+
+        private string device_ssid;
+        public string DeviceSSID
+        {
+            get => device_ssid;
+            set => SetProperty(ref device_ssid, value);
+        }
+
+        private string dev_connect_to_ssid;
+        public string DevConnToSSID
+        {
+            get => dev_connect_to_ssid;
+            set => SetProperty(ref dev_connect_to_ssid, value);
+        }
+
+        private string dev_connect_to_pass;
+        public string DevConnToPass
+        {
+            get => dev_connect_to_pass;
+            set => SetProperty(ref dev_connect_to_pass, value);
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -162,7 +181,6 @@ namespace CounterApp
                 new StringContent(
                     JsonConvert.SerializeObject(babyupdate), Encoding.UTF8, "application/json")
                 ).Result;
-
         }
 
         public void UpdateThread()
@@ -187,8 +205,8 @@ namespace CounterApp
                             UpdateServer(result, baby);
                         } else
                         {
-                            device_ssid = scanner.dev_wifi_ssid;
-                            Console.WriteLine("Device got wifi with ssid: " + device_ssid);
+                            DeviceSSID = scanner.dev_wifi_ssid;
+                            Console.WriteLine("Device got wifi with ssid: " + DeviceSSID);
                         }
                     }
                 }
