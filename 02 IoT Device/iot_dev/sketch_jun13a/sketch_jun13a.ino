@@ -12,18 +12,6 @@
 #include "SparkFunBME280.h"
 #include "AESLib.h"
 
-// enum WIFI_OPS {
-//   WIFI_OPS_SSID = 0,
-//   WIFI_OPS_PASS = 1,
-//   WIFI_OPS_URL = 2
-// };
-
-// enum WIFI_STATE_MACHINE_OPS {
-//   WIFI_SM_OPS_NOT_SET = 0,
-//   WIFI_SM_GET_LEN = 1,
-//   WIFI_SM_OPS_DATA_TRANSMISSION = 2
-// };
-
 // Encryption globals
 AESLib aes;
 
@@ -43,10 +31,8 @@ bool has_wifi_creds = true;
 #define MAX_SSID_LEN 50
 #define MAX_PASS_LEN 50
 
-// char ssid[MAX_SSID_LEN + 1] = {0};
-// char pass[MAX_PASS_LEN + 1] = {0};
-char ssid[MAX_SSID_LEN + 1] = "Home";
-char pass[MAX_PASS_LEN + 1] = "097452430";
+char ssid[MAX_SSID_LEN + 1] = {0};
+char pass[MAX_PASS_LEN + 1] = {0};
 
 const char azure_details_func_url[] = "https://ilovemybaby.azurewebsites.net/api/babytagupdate";
 
@@ -76,9 +62,6 @@ class TempCallbacks: public BLECharacteristicCallbacks {
     void onRead(BLECharacteristic *pCharacteristic) {
       temp = mySensor.readTempC();
       pCharacteristic->setValue(temp);
-      // char buff[20] = {0};
-      // sprintf(buff, "Read Temp: %.2f\0", temp);
-      // Serial.println(buff); (DEBUG)
     }
 };
 
@@ -86,9 +69,6 @@ class HumdCallbacks: public BLECharacteristicCallbacks {
     void onRead(BLECharacteristic *pCharacteristic) {
       humidity = mySensor.readFloatHumidity();
       pCharacteristic->setValue(humidity);
-      // char buff[30] = {0};
-      // sprintf(buff, "Read Humidity: %.2f\0", humidity);
-      // Serial.println(buff); (DEBUG)
     }
 };
 
@@ -99,10 +79,6 @@ class WifiSSIDCallbacks: public BLECharacteristicCallbacks {
     if (param->write.len <= MAX_SSID_LEN) {
       memcpy(ssid, param->write.value, param->write.len);
     }
-
-    char bla[40] = {0};
-    sprintf(bla, "Got ssid: %s\0", ssid);
-    Serial.println(bla);
 
     char buff[4] = {0};
     pCharacteristic->setValue(buff);
@@ -119,9 +95,6 @@ class WifiPassCallbacks: public BLECharacteristicCallbacks {
     // Encrypted, decrypt and copy...
     if (param->write.len <= MAX_PASS_LEN) {
       uint16_t i = aes.decrypt(param->write.value, param->write.len, (byte*)pass, aes_key, 128, aes_sync);
-      
-      sprintf(buff, "Got pass, len %d\0", i);
-      Serial.println(buff);
 
       for (; i < param->write.len; i++) {
         pass[i] = '\0';
@@ -129,9 +102,6 @@ class WifiPassCallbacks: public BLECharacteristicCallbacks {
 
       if (ssid[0] != '\0' && pass[0] != '\0') has_wifi_creds = true;
     }
-
-    sprintf(buff, "Got pass: %s\0", pass);
-    Serial.println(buff);
   }
 };
 
@@ -146,15 +116,6 @@ void aes_init() {
   // Generating random sync
   esp_fill_random(aes_sync, N_BLOCK);
   for (int i=0; i < N_BLOCK;i++) if (aes_sync[i] == 0) aes_sync[i] = 1; // We use it after as a string
-  // TODO : DEBUG REMOVE
-  int i;
-  for (i = 0; i < 16; i++)
-  {
-      if (i > 0) printf(":");
-      printf("%02X", aes_sync[i]);
-  }
-  printf("\n");
-// -------------------
   aes.set_paddingmode(paddingMode::CMS);
 }
 
@@ -238,20 +199,15 @@ void setup()
 
 void loop()
 {
-  char buff[30] = {0};
   if (has_wifi_creds) { // If got wifi_creds, trying to publish data via wifi
 
-      sprintf(buff, "Has wifi creds!\0", humidity);
-      Serial.println(buff);
-
     if (WiFi.status() != WL_CONNECTED && WiFi.status() != WL_IDLE_STATUS) { // Trying to connect
+        
         WiFi.begin(ssid, pass);
-        delay(1000);  
+        delay(1000);
+
     } else if (WiFi.status() == WL_CONNECTED) { // If connected, publishing data    
       pWifiSSIDChar->setValue(ssid);
-
-      sprintf(buff, "Connected to wifi!\0");
-      Serial.println(buff);
 
       WiFiClientSecure client;
       HTTPClient http;
@@ -269,23 +225,17 @@ void loop()
       
       // Data to send with HTTP POST
       sprintf(sens_data_str,
-      "{'babyid': '%s', 'details': {'temprature': %.2f, 'humidity': %.2f}}",
+      "{\"babyid\": \"%s\", \"details\": {\"temprature\": %.2f, \"humidity\": %.2f}}",
               SERVICE_UUID,
               mySensor.readTempC(),
               mySensor.readFloatHumidity()
               );
 
-      Serial.println(sens_data_str);
-
       // Send HTTP POST request
       int httpResponseCode = http.POST(sens_data_str);
-      Serial.println(http.getString());
-      sprintf(buff, "Resp from server: %d\0", httpResponseCode);
-      Serial.println(buff);
-
       http.end();
     }
   }
 
-  delay(600); // TODO : When everything works, run this every half a minute
+  delay(30000); // TODO : When everything works, run this every half a minute
 }
