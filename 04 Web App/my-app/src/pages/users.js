@@ -50,13 +50,19 @@ function User() {
             <Typography variant="h4" gutterBottom>
                 Family Status for {familyName} Family
             </Typography>
-            {familyStatus.map(status => (
-                <Box key={status.babyid} border={1} p={2} marginBottom={2}>
-                    <Typography variant="h6">Baby Name: {status.babyname}</Typography>
-                    <Typography>Last Update: {status.lastupdate}</Typography>
-                    <Typography>Details: (location: {status.details})</Typography>
-                </Box>
-            ))}
+            {familyStatus.map(status => {
+                const details = status.details ? JSON.parse(status.details) : null;
+                const detailsString = details
+                    ? `Details: location: ${details.location}, temperature: ${details.temprature}, humidity: ${details.humidity}`
+                    : 'Details: No data available';
+                return (
+                    <Box key={status.babyid} border={1} p={2} marginBottom={2}>
+                        <Typography variant="h6">Baby Name: {status.babyname}</Typography>
+                        <Typography>Last Update: {status.lastupdate}</Typography>
+                        <Typography>{detailsString}</Typography>
+                    </Box>
+                );
+            })}
             <Box display="flex" flexDirection="column">
                 <TextField
                     label="Baby ID"
@@ -75,10 +81,7 @@ function User() {
                     Add new Baby
                 </Button>
             </Box>
-            <SignalRNotifications /> {
-            /*SignalRNotifications component */
-            
-            }
+            <SignalRNotifications />
         </Container>
     );
 }

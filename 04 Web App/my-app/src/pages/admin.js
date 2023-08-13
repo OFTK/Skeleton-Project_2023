@@ -1,35 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Box, Container, Typography, TextField, Button } from '@mui/material';
+import SignalRNotifications from './SignalRNotifications'; 
 
-
-const Admin = () => {
-
-  
+function Admin() {
+    const [familyNames, setFamilyNames] = useState({ family_names: [] });
+    const [selectedFamily, setSelectedFamily] = useState(null);
     const [familyStatus, setFamilyStatus] = useState([]);
-    const [familyName] = useState('family'); // Replace with family name
     const [newBabyId, setNewBabyId] = useState('');
     const [newBabyName, setNewBabyName] = useState('');
-    
-    useEffect(() => {
-        fetchFamilyStatus();
-    }); //[]
 
-    const fetchFamilyStatus = () => {
-        axios
-            .get(`https://ilovemybaby.azurewebsites.net/api/getfamilystatus?family=${familyName}`)
-            .then(response => {
-                setFamilyStatus(response.data.status);
-            })
-            .catch(error => {
-                console.error('Error fetching family status:', error);
-            });
-    };
+
+    async function fetchFamilyNames() {
+        try {
+            const response = await axios.get('http://localhost:7071/api/getallfamilies');
+            setFamilyNames(response.data);
+            console.log('Response:', response.data); 
+        } catch (error) {
+            console.error('Error fetching family names:', error);
+            }
+        }
+        
+    
+    async function fetchFamilyDetails(familyName) {
+        try {
+            const response = await axios.get(`https://ilovemybaby.azurewebsites.net/api/getfamilystatus?family=${familyName}`);
+            setFamilyStatus(response.data.status);
+        } catch (error) {
+            console.error('Error fetching family details:', error);
+        }
+    }
 
     const handleAddBaby = () => {
-        if (newBabyId && newBabyName) {
+        if (newBabyId && newBabyName && selectedFamily) {
             const babyData = {
-                family: familyName,
+                family: selectedFamily,
                 babyname: newBabyName,
                 babyid: newBabyId
             };
@@ -37,7 +42,7 @@ const Admin = () => {
             axios
                 .post('https://ilovemybaby.azurewebsites.net/api/addBaby', babyData)
                 .then(() => {
-                    fetchFamilyStatus();
+                    fetchFamilyDetails(selectedFamily);
                     setNewBabyId('');
                     setNewBabyName('');
                 })
@@ -47,43 +52,103 @@ const Admin = () => {
         }
     };
 
+    const handleDeleteBaby = (babyId) => {
+        if (selectedFamily && babyId) {
+            axios
+                .post('http://localhost:7071/api/deletebaby', {
+                    family: selectedFamily,
+                    babyid: babyId
+                })
+                .then(() => {
+                    fetchFamilyDetails(selectedFamily);
+                })
+                .catch(error => {
+                    console.error('Error deleting baby:', error);
+                });
+        }
+    };
+
+    useEffect(() => {
+        fetchFamilyNames();
+    }, []);
+
+    useEffect(() => {
+        if (selectedFamily) {
+            fetchFamilyDetails(selectedFamily);
+        }
+    }, [selectedFamily]);
+
+
     return (
         <Container maxWidth="md" style={{ marginTop: '20px' }}>
             <Typography variant="h4" gutterBottom>
-                Administraion Page for System Administrators
-                </Typography>
-                <Typography variant="h5" gutterBottom>
-                Family Status for {familyName} Family
+                Administration Page for System Administrators
             </Typography>
-            {familyStatus.map(status => (
-                <Box key={status.babyid} border={1} p={2} marginBottom={2}>
-                    <Typography variant="h6">Baby Name: {status.babyname}</Typography>
-                    <Typography>Last Update: {status.lastupdate}</Typography>
-                    <Typography>Details: (location: {status.details})</Typography>
-                </Box>
-            ))}
-            <Box display="flex" flexDirection="column">
-                <TextField
-                    label="Baby ID"
-                    value={newBabyId}
-                    onChange={e => setNewBabyId(e.target.value)}
+           <ul style={{ listStyle: 'none', padding: 0 }}>
+                 {familyNames && familyNames.family_names.map((familyName, index) => (
+                  <li key={index}>
+                     <Button
                     variant="outlined"
-                    margin="dense" />
+                    onClick={() => setSelectedFamily(familyName)}
+                        style={{
+                            marginBottom: '10px',
+                            marginRight: '10px',
+                            backgroundColor: '#1976d2',
+                            color: 'white',
+                            border: 'none',
+                            textTransform: 'none',
+                }}
+            >
+                {familyName}
+            </Button>
+        </li>
+    ))}
+</ul>
 
+             {selectedFamily && (
+                <div>
+                    <Typography variant="h4" gutterBottom>
+                        Family Details for {selectedFamily} Family
+                    </Typography>
+                    {familyStatus.map(status => {
+                        const details = status.details ? JSON.parse(status.details) : null;
+                        const detailsString = details
+                            ? `Details: location: ${details.location}, temperature: ${details.temprature}, humidity: ${details.humidity}`
+                            : 'Details: No data available';
+                        return (
+                            <Box key={status.babyid} border={1} p={2} marginBottom={2}>
+                                <Typography variant="h6">Baby Name: {status.babyname}</Typography>
+                                <Typography>Last Update: {status.lastupdate}</Typography>
+                                <Typography>{detailsString}</Typography>
+                                <Button variant="contained" color="secondary" onClick={() => handleDeleteBaby(status.babyid)}>
+                                    Delete Baby
+                                </Button>
+                            </Box>
+                        );
+                    })}
+                    <Box display="flex" flexDirection="column">
+                        <TextField
+                            label="Baby ID"
+                            value={newBabyId}
+                            onChange={e => setNewBabyId(e.target.value)}
+                            variant="outlined"
+                            margin="dense" />
 
-                <TextField
-                    label="Baby Name"
-                    value={newBabyName}
-                    onChange={e => setNewBabyName(e.target.value)}
-                    variant="outlined"
-                    margin="dense" />
-                <Button variant="contained" color="primary" onClick={handleAddBaby}>
-                    Add new Baby
-                </Button>
-
-            </Box>
+                        <TextField
+                            label="Baby Name"
+                            value={newBabyName}
+                            onChange={e => setNewBabyName(e.target.value)}
+                            variant="outlined"
+                            margin="dense" />
+                        <Button variant="contained" color="primary" onClick={handleAddBaby}>
+                            Add new Baby
+                        </Button>
+                    </Box>
+                </div>
+            )} 
+            <SignalRNotifications />
         </Container>
     );
-};
+}
 
 export default Admin;

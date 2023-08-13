@@ -15,7 +15,7 @@ const SignalRNotifications = () => {
 
         connection.on('babyalert', (message) => {
             setMessages(prevMessages => [...prevMessages, message]);
-            toast.info(JSON.stringify(message).substring(1, JSON.stringify(message).length - 1));
+            showNotification(message);
         });
 
         connection.start()
@@ -26,14 +26,23 @@ const SignalRNotifications = () => {
         };
     }, []);
 
+    const showNotification = (message) => {
+        const alertInfo = message.alert_list[0];
+        const formattedMessage = `alert: babyid: ${alertInfo.babyid}, babyname: ${alertInfo.babyname}, alert reason: ${alertInfo.alertreason}`;
+        toast.info(formattedMessage);
+    };
+
     return (
         <div>
-            <h2>NEW BABY ALERT:</h2>
+            <h2>Received Messages:</h2>
             <ul>
                 {messages.map((message, index) => (
-                    <li key={index}>{JSON.stringify(message)}</li>
+                    <li key={index}>
+                        alert: babyid: {message.alert_list[0].babyid}, babyname: {message.alert_list[0].babyname}, alert reason: {message.alert_list[0].alertreason}
+                    </li>
                 ))}
             </ul>
+           
             <ToastContainer /> {/* Container for toast notifications */}
         </div>
     );
