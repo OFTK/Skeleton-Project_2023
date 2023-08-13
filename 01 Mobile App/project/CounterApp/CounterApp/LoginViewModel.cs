@@ -1,7 +1,11 @@
 ﻿using System.Threading.Tasks;
 using System.Windows.Input;
-using CounterApp.Services;
 using Xamarin.Forms;
+using Xamarin.Essentials;
+using System.Linq;
+using System.Text;
+using Xamarin.Forms.Xaml;
+using System;
 
 namespace CounterApp
 {
@@ -16,11 +20,11 @@ namespace CounterApp
 
         private async Task Login()
         {
-            var azureService = DependencyService.Get<IAzureService>();
-            if (await azureService.Authenticate())
-            {
-                await Application.Current.MainPage.Navigation.PopModalAsync();
-            }
+            var authResult = await WebAuthenticator.AuthenticateAsync(
+                    new Uri("https://ilovemybabysecure.azurewebsites.net/.auth/login/aad"),
+                    new Uri("myapp://"));
+
+            string accessToken = authResult?.AccessToken;
         }
     }
 }

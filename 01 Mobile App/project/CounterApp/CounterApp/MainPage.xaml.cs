@@ -8,8 +8,8 @@ using Xamarin.Forms;
 using Xamarin.Essentials;
 using Xamarin.CommunityToolkit.UI.Views;
 using Xamarin.CommunityToolkit.Extensions;
-using CounterApp.Services;
 using static CounterApp.MainViewModel;
+
 
 namespace CounterApp
 {
@@ -33,13 +33,12 @@ namespace CounterApp
                 return;
             }
 
-            var azureService = DependencyService.Get<IAzureService>();
-
-            if (!azureService.IsLoggedIn())
-            {
-                if (!Navigation.ModalStack.Any())
-                    await Navigation.PushModalAsync(new LoginPage(), false);
-            }
+            // TODO: check that user isn't logged in before navigating to login page
+            // if (true)
+            // {
+            //     if (!Navigation.ModalStack.Any())
+            //         await Navigation.PushModalAsync(new LoginPage(), false);
+            // }
         }
 
         private async Task<bool> PermissionsGrantedAsync()      // Function to make sure that all the appropriate approvals are in place

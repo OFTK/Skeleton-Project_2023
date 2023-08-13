@@ -23,7 +23,7 @@ using System.Net.Mime;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
-using CounterApp.Services;
+using System.Net;
 
 namespace CounterApp
 {
@@ -47,6 +47,7 @@ namespace CounterApp
         private static readonly string updateBabyDetailsUrl = baseUrl + "/api/updatebabystatus";
 
         public HttpClient client;
+        string authToken;
 
         // attributs to display baby details
         static string family = "family";
@@ -130,6 +131,7 @@ namespace CounterApp
 
             // send http request
             HttpClient GetClient = new HttpClient();
+            GetClient.DefaultRequestHeaders.Add("X-ZUMO-AUTH", authToken);
             string url = geturi_builder.ToString();
             HttpResponseMessage resp = GetClient.GetAsync(url).Result;
 
@@ -217,6 +219,7 @@ namespace CounterApp
 
             // send http request
             HttpClient PostClient = new HttpClient();
+            PostClient.DefaultRequestHeaders.Add("X-ZUMO-AUTH", authToken);
             HttpResponseMessage resp = PostClient.PostAsync(
                 updateBabyDetailsUrl,
                 // serialize babyupdate
@@ -322,6 +325,7 @@ namespace CounterApp
         {
             // // init objects for communication
             // client = new HttpClient();
+            // client.DefaultRequestHeaders.Add("X-ZUMO-AUTH", authToken);
             // connection = new HubConnectionBuilder().WithUrl(new Uri(baseUrl + "/api")).Build();
             // Task signalr_connection_task = Task.Run(async () => await ConnectToSignalr());
             // GetFamilyDetails();
@@ -341,14 +345,20 @@ namespace CounterApp
         }
 
         // get family details and connect to signalr on main page appear
-        public Task StartViewModel()
+        public async Task<Task> StartViewModel()
         {
-            var azureService = DependencyService.Get<IAzureService>();
 
-            // TODO: change the following line back to: if (azureService.IsLoggedIn())
+            // TODO: add a check if user is logged in
             if (true)
             {
+                var authResult = await WebAuthenticator.AuthenticateAsync(
+                    new Uri("https://ilovemybabysecure.azurewebsites.net/.auth/login/aad"),
+                    new Uri("myapp://"));
+
+                authToken = authResult?.AccessToken;
+
                 client = new HttpClient();
+                client.DefaultRequestHeaders.Add("X-ZUMO-AUTH", authToken);
                 connection = new HubConnectionBuilder().WithUrl(new Uri(baseUrl + "/api")).Build();
                 Task signalr_connection_task = Task.Run(async () => await ConnectToSignalr());
                 GetFamilyDetails();
