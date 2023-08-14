@@ -4,6 +4,7 @@ import logging
 from datetime import datetime, timedelta
 import azure.functions as func
 from azure.data.tables import TableClient
+import jwt
 
 # get last name from full name
 def get_last_name(full_name):
@@ -27,9 +28,15 @@ def main(req: func.HttpRequest, signalRMessages: func.Out[str]) -> func.HttpResp
         family = get_last_name(req.headers['x-ms-token-aad-id-token'])
     except Exception as e:
         logging.error(e)
+        # put all request headers and value in a string called headers
+        headers = ""
+        for header in req.headers:
+            headers += f"{header}: {req.headers[header]}\n"
+
+        # return error response
         return func.HttpResponse(
-             f"request must have x-ms-client-principal-name header in it",
-             status_code=400
+            f"request must have header x-ms-token-aad-id-token family name in it\n\n{headers}",
+            status_code=400
         )
 
     try: req_body = req.get_json()
