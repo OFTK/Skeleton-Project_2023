@@ -14,6 +14,8 @@ namespace CounterApp
         public MainPage()
         {
             InitializeComponent();
+
+            BindingContext = ViewModelLocator.MainViewModel;
         }
 
         protected async override void OnAppearing()
@@ -38,6 +40,11 @@ namespace CounterApp
             }
 
             return status == PermissionStatus.Granted;
+        }
+
+        private void WifiBut_Clicked(object sender, EventArgs e)
+        {
+            Navigation.PushAsync(new EnterWifiCredsPage());
         }
     }
 }

@@ -24,6 +24,18 @@ using System.Text;
 
 namespace CounterApp
 {
+    public static class ViewModelLocator
+    {
+        private static MainViewModel _myViewModel = new MainViewModel();
+        public static MainViewModel MainViewModel
+        {
+            get
+            {
+                return _myViewModel;
+            }
+        }
+    }
+
     public class MainViewModel : INotifyPropertyChanged
     {
 
@@ -193,7 +205,7 @@ namespace CounterApp
                 for (int i = 0; i < FamilyStatusDisplay.status.Count; i++)
                 {
                     Status baby = FamilyStatusDisplay.status[i];
-                    BabyStatus result = scanner.BLEScan(baby.babyid).Result;
+                    BabyStatus result = scanner.BLEScan(baby.babyid, dev_connect_to_ssid, dev_connect_to_pass).Result;
 
                     if (result != null && result._BabyTemp != null)
                     {
@@ -208,6 +220,9 @@ namespace CounterApp
                             DeviceSSID = scanner.dev_wifi_ssid;
                             Console.WriteLine("Device got wifi with ssid: " + DeviceSSID);
                         }
+                    } else
+                    {
+                        DeviceSSID = null;
                     }
                 }
 
@@ -239,6 +254,11 @@ namespace CounterApp
         ////////////////
         public MainViewModel()
         {
+            // Setting ble settings...
+            dev_connect_to_ssid = null;
+            dev_connect_to_pass = null;
+            device_ssid = null;
+
             // init objects for communication
             client = new HttpClient();
             connection = new HubConnectionBuilder().WithUrl(new Uri(baseUrl + "/api")).Build();

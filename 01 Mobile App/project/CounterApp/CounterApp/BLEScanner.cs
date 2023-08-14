@@ -85,8 +85,8 @@ namespace CounterApp
                                                             string wifi_pass = null)
         {
             // TODO : This is debug! Do the real thing!
-            wifi_ssid = "Home";
-            wifi_pass = "097452430";
+            /*wifi_ssid = "Home";
+            wifi_pass = "097452430";*/
             // ----------------------------------------
             // TODO : Get the key from cloud
             byte[] aes_key = new byte[16] { 0xa1, 0x95, 0x1f, 0x50, 0xe5, 0x66, 0x8b, 0xb7, 0x23, 0xd4, 0xfa, 0x8a, 0xb3, 0x5a, 0xef, 0x14 }; // Constant for every iot dev
