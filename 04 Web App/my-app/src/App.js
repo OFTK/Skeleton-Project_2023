@@ -6,9 +6,10 @@ import About from './pages/about';
 import User from './pages/users';
 import SignUp from './pages/sign-up';
 import Admin from './pages/admin';
-
+import Project from './pages/project';
 
 function App() {
+
 	return (
 		<Router>
 			<Navbar />
@@ -17,6 +18,7 @@ function App() {
 				<Route path='/Admin' element={<Admin />} />
 				<Route path='/About' element={<About />} />
 				<Route path='/sign-up' element={<SignUp />} />
+        <Route path='/project' element={<Project />} />
 			</Routes>
 		</Router>
 	);
