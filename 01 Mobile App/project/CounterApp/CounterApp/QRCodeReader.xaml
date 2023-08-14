@@ -7,8 +7,19 @@
         <StackLayout>
             <Label x:Name="NotifyUser"
                 VerticalOptions="Start" 
-                HorizontalOptions="CenterAndExpand" 
+                HorizontalOptions="StartAndExpand" 
                    TextColor="Green"/>
+
+            <Entry x:Name="NewBabyName"
+                   IsVisible="False"
+                   VerticalOptions="Start" 
+                HorizontalOptions="StartAndExpand" />
+            
+            <Button x:Name="NewBabyButton"
+                    IsVisible="False"
+                    VerticalOptions="Start" 
+                    HorizontalOptions="StartAndExpand" 
+                    Clicked="NewBabyButton_Clicked"/>
 
             <zxing:ZXingScannerView IsScanning="True" OnScanResult="ZXingScannerView_OnScanResult"/>
         </StackLayout>

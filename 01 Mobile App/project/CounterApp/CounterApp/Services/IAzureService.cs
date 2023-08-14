@@ -12,5 +12,6 @@ namespace CounterApp.Services
         Task<bool> Authenticate();
         Task<string> GetFamilyDetailsFromServer();
         Task<string> UpdateBabyDetailsToServer(JObject update_request);
+        Task<string> AddBabyToServer(JObject addbabyrequest);
     }
 }
