@@ -78,17 +78,20 @@ def main(req: func.HttpRequest, signalRMessages: func.Out[str]) -> func.HttpResp
     logging.info(f"validating request to update status of {req_body}")
     connection_string = os.getenv("AzureWebJobsStorage")
     try:
+        logging.warning(f"trying to update {babyid} in the DB")
         with TableClient.from_connection_string(connection_string, table_name="project") as table:
             
             # search entire table for babyid (across all families)
             logging.info(f"searching for babyid {babyid} in the DB")
             query_filter = f"babyid eq '{babyid}'"
+            logging.warning(f"query filter is {query_filter}")
             entities = table.query_entities(query_filter)
             for entity in entities:
-                logging.info(f"babyid {babyid} found in the DB")
+                logging.warning(f"babyid {babyid} found in the DB")
                 babyname = entity['RowKey']
                 family = entity['PartitionKey']
-                logging.info(f"babyname is {babyname} from family {family}")
+                logging.warning(f"babyname is {babyname} from family {family}")
+
 
             # udpate time and location
             update_time = datetime.now().isoformat()
@@ -96,10 +99,15 @@ def main(req: func.HttpRequest, signalRMessages: func.Out[str]) -> func.HttpResp
             entity['lastupdate'] = update_time
             
             # update only tempraure and humidity
-            details_from_db = json.loads(entity['details'])
-            details_from_db['temprature'] = temprature
-            details_from_db['humidity'] = humidity
-            entity['details'] = json.dumps(details_from_db)
+            details_dictionary = {}
+            try:
+                details_from_db = json.loads(entity['details'])
+                details_dictionary['location'] = details_from_db['location']
+            except:
+                details_dictionary['location'] = "unknown"
+            details_dictionary['temprature'] = temprature
+            details_dictionary['humidity'] = humidity
+            entity['details'] = json.dumps(details_dictionary)
             table.update_entity(entity=entity, mode='replace')
             
             # return success
