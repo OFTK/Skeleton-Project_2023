@@ -54,7 +54,7 @@ namespace CounterApp
         // connection and display
         public HubConnection connection;
         // private static readonly string baseUrl = "https://skeletonfunctionapp.azurewebsites.net";
-        private static readonly string baseUrl = "https://ilovemybaby.azurewebsites.net";
+        private static readonly string baseUrl = "https://ilovemybabysecure.azurewebsites.net";
         private static readonly string getFamilyDetailsUrl = baseUrl + "/api/getfamilystatus";
         private static readonly string updateBabyDetailsUrl = baseUrl + "/api/updatebabystatus";
 
@@ -169,13 +169,15 @@ namespace CounterApp
             geturi_builder.Query = query.ToString();
 
             // send http request
-            HttpClient GetClient = new HttpClient();
-            // GetClient.DefaultRequestHeaders.Add("X-ZUMO-AUTH", authToken);
-            string url = geturi_builder.ToString();
-            HttpResponseMessage resp = GetClient.GetAsync(url).Result;
+            // HttpClient GetClient = new HttpClient();
+            // string url = geturi_builder.ToString();
+            // HttpResponseMessage resp = GetClient.GetAsync(url).Result;
+
+            var azureService = DependencyService.Get<IAzureService>();
+            string response_string = azureService.GetFamilyDetailsFromServer().Result;
 
             // display the response for debug purposes
-            string response_string = resp.Content.ReadAsStringAsync().Result;
+            // string response_string = resp.Content.ReadAsStringAsync().Result;
             Debug.WriteLine(response_string);
             Debug.WriteLine(connection.ConnectionId);
 
@@ -264,7 +266,10 @@ namespace CounterApp
                 new StringContent(
                     JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json")
                 ).Result;
-            Debug.WriteLine(resp.Content.ToString());
+            var azureService = DependencyService.Get<IAzureService>();
+            string response_string = azureService.UpdateBabyDetailsToServer(request).Result;
+
+            Debug.WriteLine(response_string);
         }
 
         public void UpdateNearbyBabyToServer()

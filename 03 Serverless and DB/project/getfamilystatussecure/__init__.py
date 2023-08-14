@@ -4,22 +4,34 @@ import logging
 from datetime import datetime, timedelta
 import azure.functions as func
 from azure.data.tables import TableClient
+import jwt
 
-# get last name from full name
-def get_last_name(full_name):
-    return full_name.split(" ")[-1]
+# get username from jwt token in x-ms-token-aad-id-token header
+def get_last_name(header_value):
+    # decode jwt in x-ms-token-aad-id-token header to get user name without validating signature (verify=False)
+    jwt_payload = jwt.decode(header_value, options={"verify_signature": False})
+    # get last name from jwt payload
+    last_name = jwt_payload['name'].split(' ')[-1].lower()
+    return last_name
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    logging.info('running main of getfamilystatussecure')
+    logging.warning('running main of getfamilystatussecure')
+    logging.error('running main of getfamilystatussecure')
 
     try:
-        # check username (x-ms-client-principal-name is provided by the identity provider)
-        family = get_last_name(req.headers.get('x-ms-client-principal-name'))
+        # decode jwt in x-ms-token-aad-id-token header to get user name
+        family = get_last_name(req.headers['x-ms-token-aad-id-token'])
     except Exception as e:
         logging.error(e)
+        # put all request headers and value in a string called headers
+        headers = ""
+        for header in req.headers:
+            headers += f"{header}: {req.headers[header]}\n"
+        
+        # return error response
         return func.HttpResponse(
-             f"request must have x-ms-client-principal-name header in it",
-             status_code=400
+            f"request must have header x-ms-token-aad-id-token family name in it\n\n{headers}",
+            status_code=400
         )
 
     logging.warning(f"user {family} requested the status of the family")

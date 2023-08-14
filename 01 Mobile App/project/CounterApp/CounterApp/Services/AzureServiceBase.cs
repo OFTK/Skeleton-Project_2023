@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.MobileServices;
 using CounterApp.Services;
 using Xamarin.Forms;
+using System.Net.Http;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace CounterApp.Services
 {
@@ -24,7 +27,7 @@ namespace CounterApp.Services
 
         public bool IsLoggedIn()
         {
-            TryLoadUserDetails(); 
+            // TryLoadUserDetails(); 
             return Client.CurrentUser != null;
         }
 
@@ -68,6 +71,32 @@ namespace CounterApp.Services
                     MobileServiceAuthenticationToken = authToken.ToString()
                 };
             }
+        }
+
+        public async Task<string> GetFamilyDetailsFromServer()
+        {
+            string token = Client.CurrentUser.MobileServiceAuthenticationToken;
+            HttpClient getfamilyclient = new HttpClient();
+            getfamilyclient.DefaultRequestHeaders.Add("X-ZUMO-AUTH", token);
+            HttpResponseMessage resp = getfamilyclient.GetAsync("https://ilovemybabysecure.azurewebsites.net/api/getfamilystatussecure").Result;
+            string resp_str = resp.Content.ReadAsStringAsync().Result;
+
+            return resp_str;
+        }
+        public async Task<string> UpdateBabyDetailsToServer(JObject update_request)
+        {
+            // send http request
+            string token = Client.CurrentUser.MobileServiceAuthenticationToken;
+            HttpClient PostClient = new HttpClient();
+            PostClient.DefaultRequestHeaders.Add("X-ZUMO-AUTH", token);
+            HttpResponseMessage resp = PostClient.PostAsync(
+                "https://ilovemybabysecure.azurewebsites.net/api/updatebabystatussecure",
+                // serialize babyupdate
+                new StringContent(
+                    JsonConvert.SerializeObject(update_request), Encoding.UTF8, "application/json")
+                ).Result;
+
+            return resp.Content.ToString();
         }
     }
 }
