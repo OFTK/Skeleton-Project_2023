@@ -37,7 +37,7 @@ const BabyCardContent = styled(CardContent)`
 
 const User = () => {
   const [familyStatus, setFamilyStatus] = useState([]);
-  const [familyName] = useState('family'); // Replace with family name
+  const [familyName] = useState('kaplan'); // Replace with family name
   const [newBabyId, setNewBabyId] = useState('');
   const [newBabyName, setNewBabyName] = useState('');
 
@@ -65,7 +65,7 @@ const User = () => {
       };
 
       axios
-        .post('https://ilovemybaby.azurewebsites.net/api/addBaby', babyData)
+        .post('https://ilovemybaby.azurewebsites.net/api/addbaby', babyData)
         .then(() => {
           fetchFamilyStatus();
           setNewBabyId('');

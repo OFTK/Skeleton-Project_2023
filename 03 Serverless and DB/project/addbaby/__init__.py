@@ -88,21 +88,6 @@ def main(req: func.HttpRequest, signalRMessages: func.Out[str]) -> func.HttpResp
     try:
         with TableClient.from_connection_string(connection_string, table_name="project") as table:
             # check if babyname or babyid already exists
-            families_table = table.get_table_client(table_name="families")
-            family_entity = families_table.get_entity(partition_key="families", row_key=family)
-            if not family_entity:
-                new_family_entity = {
-                    u'PartitionKey': u'families',
-                    u'RowKey': u'{}'.format(family)
-                }
-                try:
-                    families_table.create_entity(entity=new_family_entity)
-                except Exception as e:
-                    logging.error(e)
-                    return func.HttpResponse(
-                        "Failed to add family to the 'families' table",
-                        status_code=500
-                    )
             get_family_babies_query = f"PartitionKey eq '{family}'"
             entities = table.query_entities(get_family_babies_query)
             for entity in entities:
@@ -123,9 +108,7 @@ def main(req: func.HttpRequest, signalRMessages: func.Out[str]) -> func.HttpResp
                         f"baby tag {babyid} is an already exists in your account",
                         status_code=400
                     )
-
-        
-            # everything is ok - add baby to database
+                # everything is ok - add baby to database
             new_baby_entity = {
                 u'PartitionKey': u'{}'.format(family),
                 u'RowKey': u'{}'.format(babyname),
