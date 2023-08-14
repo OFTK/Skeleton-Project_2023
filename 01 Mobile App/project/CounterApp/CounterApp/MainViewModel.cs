@@ -23,6 +23,7 @@ using System.Net.Mime;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using CounterApp.Services;
 
 namespace CounterApp
 {
@@ -43,11 +44,17 @@ namespace CounterApp
 
         // fields
         /////////
-        
+        public string _ViewModelNotStarted = "true";
+        public string ViewModelNotStarted { 
+            get => _ViewModelNotStarted;
+            set => SetProperty(ref _ViewModelNotStarted, value);
+        }
+        public ICommand StartViewModelCommand { get; }
+
         // connection and display
         public HubConnection connection;
         // private static readonly string baseUrl = "https://skeletonfunctionapp.azurewebsites.net";
-        private static readonly string baseUrl = "https://ilovemybaby.azurewebsites.net";
+        private static readonly string baseUrl = "https://ilovemybabysecure.azurewebsites.net";
         private static readonly string getFamilyDetailsUrl = baseUrl + "/api/getfamilystatus";
         private static readonly string updateBabyDetailsUrl = baseUrl + "/api/updatebabystatus";
 
@@ -162,13 +169,15 @@ namespace CounterApp
             geturi_builder.Query = query.ToString();
 
             // send http request
-            HttpClient GetClient = new HttpClient();
-            // GetClient.DefaultRequestHeaders.Add("X-ZUMO-AUTH", authToken);
-            string url = geturi_builder.ToString();
-            HttpResponseMessage resp = GetClient.GetAsync(url).Result;
+            // HttpClient GetClient = new HttpClient();
+            // string url = geturi_builder.ToString();
+            // HttpResponseMessage resp = GetClient.GetAsync(url).Result;
+
+            var azureService = DependencyService.Get<IAzureService>();
+            string response_string = azureService.GetFamilyDetailsFromServer().Result;
 
             // display the response for debug purposes
-            string response_string = resp.Content.ReadAsStringAsync().Result;
+            // string response_string = resp.Content.ReadAsStringAsync().Result;
             Debug.WriteLine(response_string);
             Debug.WriteLine(connection.ConnectionId);
 
@@ -257,7 +266,10 @@ namespace CounterApp
                 new StringContent(
                     JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json")
                 ).Result;
-            Debug.WriteLine(resp.Content.ToString());
+            var azureService = DependencyService.Get<IAzureService>();
+            string response_string = azureService.UpdateBabyDetailsToServer(request).Result;
+
+            Debug.WriteLine(response_string);
         }
 
         public void UpdateNearbyBabyToServer()
@@ -369,16 +381,48 @@ namespace CounterApp
             dev_connect_to_pass = null;
             device_ssid = null;
 
-            // init objects for communication
-            client = new HttpClient();
-            connection = new HubConnectionBuilder().WithUrl(new Uri(baseUrl + "/api")).Build();
-            Task signalr_connection_task = Task.Run(async () => await ConnectToSignalr());
-            GetFamilyDetails();
-            Thread get_family_details_thread = new Thread(GetFamilyDetailsThread){};
-            get_family_details_thread.Start();
-            Thread update_nearby_baby_to_server_thread = new Thread(UpdateNearbyBabyToServer) { };
-            update_nearby_baby_to_server_thread.Start();
-            client.Dispose();
+            // // init objects for communication
+            // client = new HttpClient();
+            // connection = new HubConnectionBuilder().WithUrl(new Uri(baseUrl + "/api")).Build();
+            // Task signalr_connection_task = Task.Run(async () => await ConnectToSignalr());
+            // GetFamilyDetails();
+            // Thread get_family_details_thread = new Thread(GetFamilyDetailsThread){};
+            // get_family_details_thread.Start();
+            // Thread update_nearby_baby_to_server_thread = new Thread(UpdateNearbyBabyToServer) { };
+            // update_nearby_baby_to_server_thread.Start();
+            // client.Dispose();
+
+            StartViewModelCommand = new Command(async () => await StartViewModel());
+
+            LocalFamilyDetails = new FamilyDetails();
+            LocalFamilyDetails.details = new List<BabyDetails>();
+            LocalFamilyDetails.family = "";
+            DisplayMessage = "";
+            DisplayMessage2 = "";
+        }
+
+        // get family details and connect to signalr on main page appear
+        public Task StartViewModel()
+        {
+            var azureService = DependencyService.Get<IAzureService>();
+
+            // TODO: change the following line back to: if (azureService.IsLoggedIn())
+            if (true)
+            {
+                client = new HttpClient();
+                connection = new HubConnectionBuilder().WithUrl(new Uri(baseUrl + "/api")).Build();
+                Task signalr_connection_task = Task.Run(async () => await ConnectToSignalr());
+                GetFamilyDetails();
+                Thread get_family_details_thread = new Thread(GetFamilyDetailsThread) { };
+                get_family_details_thread.Start();
+                Thread update_nearby_baby_to_server_thread = new Thread(UpdateNearbyBabyToServer) { };
+                update_nearby_baby_to_server_thread.Start();
+                client.Dispose();
+
+                // ViewModelNotStarted = "false";
+            }
+
+            return Task.CompletedTask;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

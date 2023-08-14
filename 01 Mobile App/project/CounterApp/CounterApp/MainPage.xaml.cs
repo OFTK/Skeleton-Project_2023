@@ -8,6 +8,7 @@ using Xamarin.Forms;
 using Xamarin.Essentials;
 using Xamarin.CommunityToolkit.UI.Views;
 using Xamarin.CommunityToolkit.Extensions;
+using CounterApp.Services;
 using static CounterApp.MainViewModel;
 
 namespace CounterApp
@@ -29,6 +30,14 @@ namespace CounterApp
             {
                 await Application.Current.MainPage.DisplayAlert("Permission required", "Application needs location permission", "OK");
                 return;
+            }
+
+            var azureService = DependencyService.Get<IAzureService>();
+
+            if (!azureService.IsLoggedIn())
+            {
+                if (!Navigation.ModalStack.Any())
+                    await Navigation.PushModalAsync(new LoginPage(), false);
             }
         }
 
@@ -86,20 +95,23 @@ namespace CounterApp
             {
                 MainViewModel.FamilyDetails familyDetails = ((MainViewModel)this.BindingContext).LocalFamilyDetails;
                 bool baby_alert = true;
-                foreach (MainViewModel.BabyDetails baby in familyDetails.details)
+                if (familyDetails != null)
                 {
-                    if (baby.baby_is_ok == false)
+                    foreach (MainViewModel.BabyDetails baby in familyDetails.details)
                     {
-                        baby.baby_is_ok = true;
-                        baby_alert = false;
+                        if (baby.baby_is_ok == false)
+                        {
+                            baby.baby_is_ok = true;
+                            baby_alert = false;
+                        }
                     }
-                }
 
-                if (baby_alert == false)
-                {
-                    Application.Current.MainPage.DisplayAlert("Baby Alert", "check out baby details", "OK");
-                }
+                    if (baby_alert == false)
+                    {
+                        Application.Current.MainPage.DisplayAlert("Baby Alert", "check out baby details", "OK");
+                    }
 
+                }
             }
         }
     }
