@@ -4,10 +4,36 @@ import logging
 from datetime import datetime
 import azure.functions as func
 from azure.data.tables import TableClient
+from uuid import UUID
 
+# check for valid UUID
+def is_valid_uuid(uuid_to_test, version=4):
+    """
+    Check if uuid_to_test is a valid UUID.
+    Parameters
+    ----------
+    uuid_to_test : str
+    version : {1, 2, 3, 4}
+    Returns
+    -------
+    `True` if uuid_to_test is a valid UUID, otherwise `False`.
+    Examples
+    --------
+    >>> is_valid_uuid('c9bf9e57-1685-4c89-bafb-ff5af830be8a')
+    True
+    >>> is_valid_uuid('c9bf9e58')
+    False
+    """
+    try:
+        uuid_obj = UUID(uuid_to_test, version=version)
+    except ValueError:
+        return False
+    return str(uuid_obj) == uuid_to_test
+
+# return true if string conains only letters, numbers, spaces or dashes
 def isname(s: str) -> bool:
     for char in s:
-        if (not (char.isalnum() or char.isspace())): return False
+        if (not (char.isalnum() or char.isspace() or char == '-')): return False
     return True
 
 def main(req: func.HttpRequest, signalRMessages: func.Out[str]) -> func.HttpResponse:
@@ -32,17 +58,29 @@ def main(req: func.HttpRequest, signalRMessages: func.Out[str]) -> func.HttpResp
         )
 
     # check that all names don't conain illegal chars
-    if not (isname(family) and isname(babyname) and isname(babyid)):
+    if not (isname(family)):
         return func.HttpResponse(
-             "request must contain family, babyname, and babyid",
+             "family name must contain only letters, numbers and spaces",
+             status_code=400
+        )
+    if not (isname(babyname)):
+        return func.HttpResponse(
+             "babyname name must contain only letters, numbers and spaces",
+             status_code=400
+        )
+    if not (isname(babyid)):
+        return func.HttpResponse(
+             "babyid name must contain only letters, numbers and spaces",
+             status_code=400
+        )
+    if not is_valid_uuid(babyid):
+        return func.HttpResponse(
+             "babyid must be a valid UUID",
              status_code=400
         )
 
     # authenticate & authorize
     # TODO
-
-    # check that babyid is legal
-    # TODO        
 
     # connect to database
     logging.info(f"validating request to add {req_body} against the DB")
@@ -50,6 +88,21 @@ def main(req: func.HttpRequest, signalRMessages: func.Out[str]) -> func.HttpResp
     try:
         with TableClient.from_connection_string(connection_string, table_name="project") as table:
             # check if babyname or babyid already exists
+            families_table = table.get_table_client(table_name="families")
+            family_entity = families_table.get_entity(partition_key="families", row_key=family)
+            if not family_entity:
+                new_family_entity = {
+                    u'PartitionKey': u'families',
+                    u'RowKey': u'{}'.format(family)
+                }
+                try:
+                    families_table.create_entity(entity=new_family_entity)
+                except Exception as e:
+                    logging.error(e)
+                    return func.HttpResponse(
+                        "Failed to add family to the 'families' table",
+                        status_code=500
+                    )
             get_family_babies_query = f"PartitionKey eq '{family}'"
             entities = table.query_entities(get_family_babies_query)
             for entity in entities:
@@ -71,13 +124,13 @@ def main(req: func.HttpRequest, signalRMessages: func.Out[str]) -> func.HttpResp
                         status_code=400
                     )
 
+        
             # everything is ok - add baby to database
             new_baby_entity = {
                 u'PartitionKey': u'{}'.format(family),
                 u'RowKey': u'{}'.format(babyname),
                 u'babyid': u'{}'.format(babyid),
-                u'latitude': 0.0,
-                u'longtitude': 0.0
+                u'details': u''
             }
             
             logging.warning(f"trying to add {new_baby_entity} to the DB")
