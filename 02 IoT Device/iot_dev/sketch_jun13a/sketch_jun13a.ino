@@ -250,9 +250,16 @@ void loop()
 
       // Send HTTP POST request
       int httpResponseCode = http.POST(sens_data_str);
+
+    char buff[40] = {0};
+    sprintf(buff, "response: %d\0",httpResponseCode);
+      
+      Serial.println(buff);
+      Serial.println(http.getString());
+
       http.end();
     }
   }
 
-  delay(1000); // TODO : When everything works, run this every half a minute
+  delay(100000); // TODO : When everything works, run this every half a minute
 }
