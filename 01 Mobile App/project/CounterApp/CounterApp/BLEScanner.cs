@@ -81,18 +81,12 @@ namespace CounterApp
         }
 
         public async Task<MainViewModel.BabyStatus> BLEScan(string ble_uuid,
+                                                            byte[] aes_key = null,
                                                             string wifi_ssid = null,
                                                             string wifi_pass = null)
         {
-            // TODO : This is debug! Do the real thing!
-            wifi_ssid = "Home";
-            wifi_pass = "097452430";
-            // ----------------------------------------
-            // TODO : Get the key from cloud
-            byte[] aes_key = new byte[16] { 0xa1, 0x95, 0x1f, 0x50, 0xe5, 0x66, 0x8b, 0xb7, 0x23, 0xd4, 0xfa, 0x8a, 0xb3, 0x5a, 0xef, 0x14 }; // Constant for every iot dev
             byte[] aes_sync = new byte[16];
             bool got_sync = false;
-            // ----------------------------------------
 
             try 
             {
@@ -174,7 +168,7 @@ namespace CounterApp
                                             status._BabyHumd = BitConverter.ToSingle(receivedBytes, 0);
                                     }
                                 }
-                                else if (wifi_ssid != null && character.Uuid.ToString() == SYNC_CHAR_UUID)
+                                else if (aes_key != null && wifi_ssid != null && character.Uuid.ToString() == SYNC_CHAR_UUID)
                                 {
                                     if (character.CanRead)
                                     {
@@ -201,7 +195,7 @@ namespace CounterApp
                                         }
                                     }
                                 }
-                                else if (character.Uuid.ToString() == WIFI_SSID_CHAR_UUID) // We also check here if dev got wifi creds
+                                else if (aes_key != null && character.Uuid.ToString() == WIFI_SSID_CHAR_UUID) // We also check here if dev got wifi creds
                                 {
                                     if (character.CanRead && character.CanWrite && got_sync)
                                     {
@@ -237,7 +231,7 @@ namespace CounterApp
                                         }
                                     }
                                 }
-                                else if (dev_change_wifi_pass && wifi_pass != null && character.Uuid.ToString() == WIFI_PASS_CHAR_UUID)
+                                else if (aes_key != null && dev_change_wifi_pass && wifi_pass != null && character.Uuid.ToString() == WIFI_PASS_CHAR_UUID)
                                 {
                                     if (character.CanWrite && got_sync)
                                     {

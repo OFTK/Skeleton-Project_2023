@@ -8,6 +8,7 @@ using Xamarin.Forms;
 using Xamarin.Essentials;
 using Xamarin.CommunityToolkit.UI.Views;
 using Xamarin.CommunityToolkit.Extensions;
+using static CounterApp.MainViewModel;
 
 namespace CounterApp
 {
@@ -16,8 +17,7 @@ namespace CounterApp
         public MainPage()
         {
             InitializeComponent();
-            
-            BindingContext = new MainViewModel();
+            BindingContext = ViewModelLocator.MainViewModel;
         }
 
         protected async override void OnAppearing()
@@ -42,6 +42,16 @@ namespace CounterApp
             }
 
             return status == PermissionStatus.Granted;
+        }
+
+        private void WifiBut_Clicked(object sender, EventArgs e)
+        {
+            Navigation.PushAsync(new EnterWifiCredsPage());
+        }
+
+        private void QRBut_Clicked(object sender, EventArgs e)
+        {
+            Navigation.PushAsync(new QRCodeReader());
         }
 
         void OnItemTapped(object sender, ItemTappedEventArgs e)

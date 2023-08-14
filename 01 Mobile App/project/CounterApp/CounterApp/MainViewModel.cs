@@ -26,6 +26,18 @@ using System.Diagnostics;
 
 namespace CounterApp
 {
+    public static class ViewModelLocator
+    {
+        private static MainViewModel _myViewModel = new MainViewModel();
+        public static MainViewModel MainViewModel
+        {
+            get
+            {
+                return _myViewModel;
+            }
+        }
+    }
+
     public class MainViewModel : INotifyPropertyChanged
     {
 
@@ -43,9 +55,6 @@ namespace CounterApp
 
         // attributs to display baby details
         static string family = "family";
-
-        // Attributes of IoT device wifi ssid
-        static string device_ssid = "";
         
         public class BabyDetails
         {
@@ -109,6 +118,33 @@ namespace CounterApp
             set => SetProperty(ref _displayMessage2, value);
         }
 
+        private string device_ssid;
+        public string DeviceSSID
+        {
+            get => device_ssid;
+            set => SetProperty(ref device_ssid, value);
+        }
+
+        private string dev_connect_to_ssid;
+        public string DevConnToSSID
+        {
+            get => dev_connect_to_ssid;
+            set => SetProperty(ref dev_connect_to_ssid, value);
+        }
+
+        private string dev_connect_to_pass;
+        public string DevConnToPass
+        {
+            get => dev_connect_to_pass;
+            set => SetProperty(ref dev_connect_to_pass, value);
+        }
+
+        private byte[] aes_key;
+        public byte[] AesKey
+        {
+            get => aes_key;
+            set => SetProperty(ref aes_key, value);
+        }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
@@ -232,8 +268,7 @@ namespace CounterApp
                 var scanner = new BLEScanner();
                 for (int i = 0; i < LocalFamilyDetails.details.Count; i++)
                 {
-                    // scan 
-                    BabyStatus result = scanner.BLEScan(LocalFamilyDetails.details[i].babyid).Result;
+                    BabyStatus result = scanner.BLEScan(LocalFamilyDetails.details[i].babyid, aes_key, dev_connect_to_ssid, dev_connect_to_pass).Result;
 
                     if (result != null && result._BabyTemp != null)
                     {
@@ -244,9 +279,8 @@ namespace CounterApp
                         }
                         else
                         {
-                            device_ssid = scanner.dev_wifi_ssid;
-                            Console.WriteLine("Device got wifi with ssid: " + device_ssid);
-
+                            DeviceSSID = scanner.dev_wifi_ssid;
+                            Console.WriteLine("Device got wifi with ssid: " + DeviceSSID);
                         }
                     }
 
@@ -330,6 +364,11 @@ namespace CounterApp
         ////////////////
         public MainViewModel()
         {
+            // Setting ble settings...
+            dev_connect_to_ssid = null;
+            dev_connect_to_pass = null;
+            device_ssid = null;
+
             // init objects for communication
             client = new HttpClient();
             connection = new HubConnectionBuilder().WithUrl(new Uri(baseUrl + "/api")).Build();

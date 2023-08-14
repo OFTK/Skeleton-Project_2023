@@ -49,6 +49,13 @@ BLECharacteristic *pWifiSSIDChar;
 #define WIFI_SSID_CHAR_UUID      "28919cc6-36d5-11ee-be56-0242ac120002"
 #define WIFI_PASS_CHAR_UUID      "02350feb-8302-4ff7-8f04-9e07f69d73df"
 
+void aes_init() {
+  // Generating random sync
+  esp_fill_random(aes_sync, N_BLOCK);
+  for (int i=0; i < N_BLOCK; i++) if (aes_sync[i] == 0) aes_sync[i] = 1; // We use it after as a string
+  aes.set_paddingmode(paddingMode::CMS);
+}
+
 class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
       pServer->startAdvertising(); // restart advertising
@@ -104,7 +111,7 @@ class WifiPassCallbacks: public BLECharacteristicCallbacks {
     if (param->write.len <= MAX_PASS_LEN) {
       uint16_t i = aes.decrypt(param->write.value, param->write.len, (byte*)pass, aes_key, 128, aes_sync);
       
-      aes_init()
+      aes_init();
       
       for (; i < param->write.len; i++) {
         pass[i] = '\0';
@@ -120,13 +127,6 @@ void wifi_disconnected(WiFiEvent_t event, WiFiEventInfo_t info) { // On disconne
   memset(ssid, 0, sizeof(ssid));
   memset(pass, 0, sizeof(pass));
   pWifiSSIDChar->setValue(ssid);
-}
-
-void aes_init() {
-  // Generating random sync
-  esp_fill_random(aes_sync, N_BLOCK);
-  for (int i=0; i < N_BLOCK; i++) if (aes_sync[i] == 0) aes_sync[i] = 1; // We use it after as a string
-  aes.set_paddingmode(paddingMode::CMS);
 }
 
 void setup()
@@ -254,5 +254,5 @@ void loop()
     }
   }
 
-  delay(30000); // TODO : When everything works, run this every half a minute
+  delay(1000); // TODO : When everything works, run this every half a minute
 }

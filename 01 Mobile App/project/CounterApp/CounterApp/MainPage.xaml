@@ -4,8 +4,6 @@
              xmlns:local="clr-namespace:CounterApp"
              x:Class="CounterApp.MainPage"
              Title="I LOVE MY BABY">
-    
-
 
     <StackLayout>
         <Label Text="I LOVE MY BABY" HorizontalOptions="Center" FontSize="Title" FontAttributes="Bold" Margin="20"/>
@@ -24,6 +22,15 @@
 
         <Label Text="{Binding DisplayMessage, StringFormat='{0}'}" TextColor="Black" FontSize="Small"/>
         <Label Text="{Binding DisplayMessage2, StringFormat='{0}'}" TextColor="Black" FontSize="Small"/>
+        <Button Text="Change BabyTag Wifi"
+                x:Name="WifiBut"
+                Clicked="WifiBut_Clicked"
+            />
+        <Button Text="Scan for QR"
+                x:Name="QRBut"
+                Clicked="QRBut_Clicked"
+            />
+
     </StackLayout>
 
 </ContentPage>
