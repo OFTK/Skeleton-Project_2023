@@ -13,7 +13,7 @@ function Admin() {
 
     async function fetchFamilyNames() {
         try {
-            const response = await axios.get('http://localhost:7071/api/getallfamilies');
+            const response = await axios.get('https://ilovemybaby.azurewebsites.net/api/getallfamilies');
             setFamilyNames(response.data);
             console.log('Response:', response.data); 
         } catch (error) {
@@ -55,7 +55,7 @@ function Admin() {
     const handleDeleteBaby = (babyId) => {
         if (selectedFamily && babyId) {
             axios
-                .post('http://localhost:7071/api/deletebaby', {
+                .post('https://ilovemybaby.azurewebsites.net/api/deletebaby', {
                     family: selectedFamily,
                     babyid: babyId
                 })
@@ -84,19 +84,19 @@ function Admin() {
             <Typography variant="h4" gutterBottom>
                 Administration Page for System Administrators
             </Typography>
-           <ul style={{ listStyle: 'none', padding: 0 }}>
-                 {familyNames && familyNames.family_names.map((familyName, index) => (
-                  <li key={index}>
-                     <Button
-                    variant="outlined"
-                    onClick={() => setSelectedFamily(familyName)}
-                        style={{
-                            marginBottom: '10px',
-                            marginRight: '10px',
-                            backgroundColor: '#1976d2',
-                            color: 'white',
-                            border: 'none',
-                            textTransform: 'none',
+            <ul style={{ listStyle: 'none', padding: 0, display: 'flex', justifyContent: 'center' }}>
+    {familyNames && familyNames.family_names.map((familyName, index) => (
+        <li key={index}>
+            <Button
+                variant="outlined"
+                onClick={() => setSelectedFamily(familyName)}
+                style={{
+                    marginBottom: '10px',
+                    marginRight: '10px',
+                    backgroundColor: '#1976d2',
+                    color: 'white',
+                    border: 'none',
+                    textTransform: 'none',
                 }}
             >
                 {familyName}
@@ -104,6 +104,7 @@ function Admin() {
         </li>
     ))}
 </ul>
+
 
              {selectedFamily && (
                 <div>
