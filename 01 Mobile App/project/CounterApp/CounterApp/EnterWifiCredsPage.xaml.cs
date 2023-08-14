@@ -27,15 +27,20 @@ namespace CounterApp
             {
                 InstructionLabel.Text = "Enter Wifi name and password:";
 
-                if (((MainViewModel)(this.BindingContext)).DevConnToSSID != null)
-                {
-                    DevSSIDLabel.Text = $"IoT Device is trying to connect to {((MainViewModel)(this.BindingContext)).DevConnToSSID}";
-                    DevSSIDLabel.TextColor = Color.OrangeRed;
-                }
-                else
+                if (((MainViewModel)(this.BindingContext)).DevConnToSSID == null)
                 {
                     DevSSIDLabel.Text = "IoT Device is not connected to WiFi";
                     DevSSIDLabel.TextColor = Color.Red;
+                }
+                else if (((MainViewModel)(this.BindingContext)).AesKey == null)
+                {
+                    DevSSIDLabel.Text = "No encryption key, scan the device's QR code!";
+                    DevSSIDLabel.TextColor = Color.Red;
+                } 
+                else
+                {
+                    DevSSIDLabel.Text = $"IoT Device is trying to connect to {((MainViewModel)(this.BindingContext)).DevConnToSSID}";
+                    DevSSIDLabel.TextColor = Color.OrangeRed;
                 }
             }
             else

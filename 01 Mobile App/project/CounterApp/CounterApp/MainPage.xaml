@@ -22,6 +22,11 @@
                 x:Name="WifiBut"
                 Clicked="WifiBut_Clicked"
             />
+        <Button Text="Scan for QR"
+                x:Name="QRBut"
+                Clicked="QRBut_Clicked"
+            />
+
     </StackLayout>
 
 </ContentPage>

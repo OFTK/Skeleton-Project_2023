@@ -46,5 +46,10 @@ namespace CounterApp
         {
             Navigation.PushAsync(new EnterWifiCredsPage());
         }
+
+        private void QRBut_Clicked(object sender, EventArgs e)
+        {
+            Navigation.PushAsync(new  QRCodeReader());
+        }
     }
 }

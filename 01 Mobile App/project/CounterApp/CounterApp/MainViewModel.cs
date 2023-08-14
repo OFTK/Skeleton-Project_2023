@@ -134,6 +134,13 @@ namespace CounterApp
             set => SetProperty(ref dev_connect_to_pass, value);
         }
 
+        private byte[] aes_key;
+        public byte[] AesKey
+        {
+            get => aes_key;
+            set => SetProperty(ref aes_key, value);
+        }
+
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -205,7 +212,7 @@ namespace CounterApp
                 for (int i = 0; i < FamilyStatusDisplay.status.Count; i++)
                 {
                     Status baby = FamilyStatusDisplay.status[i];
-                    BabyStatus result = scanner.BLEScan(baby.babyid, dev_connect_to_ssid, dev_connect_to_pass).Result;
+                    BabyStatus result = scanner.BLEScan(baby.babyid, aes_key, dev_connect_to_ssid, dev_connect_to_pass).Result;
 
                     if (result != null && result._BabyTemp != null)
                     {
