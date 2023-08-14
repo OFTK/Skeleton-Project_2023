@@ -47,7 +47,7 @@ namespace CounterApp
         private static readonly string updateBabyDetailsUrl = baseUrl + "/api/updatebabystatus";
 
         public HttpClient client;
-        string authToken;
+        public string authToken;
 
         // attributs to display baby details
         static string family = "family";
@@ -352,8 +352,11 @@ namespace CounterApp
             if (true)
             {
                 var authResult = await WebAuthenticator.AuthenticateAsync(
-                    new Uri("https://ilovemybabysecure.azurewebsites.net/.auth/login/aad"),
-                    new Uri("myapp://"));
+                    new Uri("https://ilovemybabysecure.azurewebsites.net/.auth/login/aad?post_login_redirect_url=myapp://auth.callback"),
+                    new Uri("myapp://auth.callback"));
+                // var authResult = await WebAuthenticator.AuthenticateAsync(
+                //     new Uri("https://ilovemybabysecure.azurewebsites.net/.auth/login/aad"),
+                //     new Uri("myapp://auth.callback"));
 
                 authToken = authResult?.AccessToken;
 
