@@ -5,6 +5,7 @@ from datetime import datetime
 import azure.functions as func
 from azure.data.tables import TableClient
 from uuid import UUID
+import jwt
 
 # check for valid UUID
 def is_valid_uuid(uuid_to_test, version=4):
@@ -30,6 +31,15 @@ def is_valid_uuid(uuid_to_test, version=4):
         return False
     return str(uuid_obj) == uuid_to_test
 
+# get username from jwt token in x-ms-token-aad-id-token header
+def get_last_name(header_value):
+    # decode jwt in x-ms-token-aad-id-token header to get user name without validating signature (verify=False)
+    jwt_payload = jwt.decode(header_value, options={"verify_signature": False})
+    # get last name from jwt payload
+    last_name = jwt_payload['name'].split(' ')[-1].lower()
+    return last_name
+
+
 # return true if string conains only letters, numbers, spaces or dashes
 def isname(s: str) -> bool:
     for char in s:
@@ -38,6 +48,23 @@ def isname(s: str) -> bool:
 
 def main(req: func.HttpRequest, signalRMessages: func.Out[str]) -> func.HttpResponse:
     logging.info('running main of addbaby')
+
+    
+    try:
+        # decode jwt in x-ms-token-aad-id-token header to get user name
+        family = get_last_name(req.headers['x-ms-token-aad-id-token'])
+    except Exception as e:
+        logging.error(e)
+        # put all request headers and value in a string called headers
+        headers = ""
+        for header in req.headers:
+            headers += f"{header}: {req.headers[header]}\n"
+        
+        # return error response
+        return func.HttpResponse(
+            f"request must have header x-ms-token-aad-id-token family name in it\n\n{headers}",
+            status_code=400
+        )
 
     # parse request
     try: req_body = req.get_json()
@@ -48,7 +75,6 @@ def main(req: func.HttpRequest, signalRMessages: func.Out[str]) -> func.HttpResp
              status_code=400
         )
     try:
-        family = req_body.get('family').lower()
         babyname = req_body.get('babyname').lower()
         babyid = req_body.get('babyid').lower()
     except:
