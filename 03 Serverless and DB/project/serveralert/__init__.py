@@ -12,12 +12,13 @@ def request_getfamilystatus(family: str, url: str) -> dict:
 
 def alert_condition(status: dict) -> str:
     # check if update was too long ago
-    timediff = datetime.now() - datetime.fromisoformat(status.get("lastupdate"))
-    if timediff > timedelta(minutes=5):
-        return f"baby status not updated for {timediff}"
+    if (not (status.get("lastupdate") is None)):
+        timediff = datetime.now() - datetime.fromisoformat(status.get("lastupdate"))
+        if timediff > timedelta(minutes=5):
+            return f"baby status not updated for {timediff}"
 
     # if everything is ok - return None (no alert)
-    else: return None
+    return None
 
 
 def main(mytimer: func.TimerRequest, signalRMessages: func.Out[str]) -> None:
@@ -56,7 +57,7 @@ def main(mytimer: func.TimerRequest, signalRMessages: func.Out[str]) -> None:
             alert["babyid"] = baby.get("babyid")
             alert["babyname"] = baby.get("babyname")
             alert["alertreason"] = reason
-        alert_list.append(alert)
+            alert_list.append(alert)
 
     # send signalr to all of the family members
     logging.info('sending signalr message with contents: %s', alert_list)
