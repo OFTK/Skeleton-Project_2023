@@ -261,5 +261,5 @@ void loop()
     }
   }
 
-  delay(100000); // TODO : When everything works, run this every half a minute
+  delay(50000); // TODO : When everything works, run this every half a minute
 }

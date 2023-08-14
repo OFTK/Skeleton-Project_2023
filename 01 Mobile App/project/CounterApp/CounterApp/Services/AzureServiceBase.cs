@@ -98,5 +98,21 @@ namespace CounterApp.Services
 
             return resp.Content.ToString();
         }
+
+        public async Task<string> AddBabyToServer(JObject addbabyrequest)
+        {
+            // send http request
+            string token = Client.CurrentUser.MobileServiceAuthenticationToken;
+            HttpClient PostClient = new HttpClient();
+            PostClient.DefaultRequestHeaders.Add("X-ZUMO-AUTH", token);
+            HttpResponseMessage resp = PostClient.PostAsync(
+                "https://ilovemybabysecure.azurewebsites.net/api/addbabysecure",
+                // serialize babyupdate
+                new StringContent(
+                    JsonConvert.SerializeObject(addbabyrequest), Encoding.UTF8, "application/json")
+                ).Result;
+
+            return resp.Content.ToString();
+        }
     }
 }
