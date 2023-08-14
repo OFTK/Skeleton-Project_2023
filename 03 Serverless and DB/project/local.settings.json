@@ -11,11 +11,12 @@
     "AzureWebJobs.sendc2dmsg.Disabled": "true",
     "AzureWebJobs.updatecounter.Disabled": "true",
     "AzureWebJobs.getfamilystatus.Disabled": "true",
-    "AzureWebJobs.addbaby.Disabled": "true",
+    "AzureWebJobs.addbaby.Disabled": "false",
     "AzureWebJobs.serveralerttest.Disabled": "true",
     "AzureWebJobs.serveralert.Disabled": "true",
     "AzureWebJobs.updatebabystatus.Disabled": "true",
     "AzureWebJobs.updatebabystatussecure.Disabled": "false",
+    "AzureWebJobs.addbabysecure.Disabled": "false",
     "AzureWebJobs.getbabystatussecure.Disabled": "false"
   },
   "Host": {
