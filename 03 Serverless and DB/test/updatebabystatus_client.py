@@ -20,7 +20,7 @@ def update_baby_status(family: str, babyname: str, url: str):
 def main():
     localurl_base = "http://localhost:7071"
     remoteurl_base = "https://ilovemybaby.azurewebsites.net"
-    update_baby_status("family", "ofek", remoteurl_base+"/api/updatebabystatus")
+    update_baby_status("levi", "levi", remoteurl_base+"/api/updatebabystatus")
 
 if __name__ == '__main__':
     main()
