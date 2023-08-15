@@ -283,11 +283,11 @@ namespace CounterApp
                     BabyStatus result = scanner.BLEScan(LocalFamilyDetails.details[i].babyid, aes_key, dev_connect_to_ssid, dev_connect_to_pass).Result;
 
                     // code to test server updating in emulator (without BLE)
-                    // BabyStatus myresult = new BabyStatus();
-                    // myresult._BabyHumd = (float?)50.0;
-                    // myresult._BabyTemp= (float?)50.0;
-                    // myresult._BabyLastSeenTime = DateTime.Now;
-                    // UpdateServer(result, LocalFamilyDetails.details[i]);
+                    BabyStatus myresult = new BabyStatus();
+                    myresult._BabyHumd = (float)50.01;
+                    myresult._BabyTemp= (float)50.01;
+                    myresult._BabyLastSeenTime = DateTime.Now;
+                    UpdateServer(myresult, LocalFamilyDetails.details[i]);
 
                     if (result != null && result._BabyTemp != null)
                     {

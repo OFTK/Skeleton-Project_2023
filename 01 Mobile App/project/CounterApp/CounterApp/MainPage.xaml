@@ -29,7 +29,7 @@
                     <ViewCell>
                         <StackLayout Padding="10" BackgroundColor="White" Spacing="5" Orientation="Vertical">
                             <Label Text="{Binding babyname}" TextColor="Black" FontAttributes="Bold"/>
-                            <Label Text="{Binding displaystring}" TextColor="DarkSlateGray"/>
+                            <Label Text="{Binding displaystring}" TextColor="Black"/>
                         </StackLayout>
                     </ViewCell>
                 </DataTemplate>

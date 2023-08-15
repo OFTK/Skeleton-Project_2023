@@ -63,19 +63,19 @@ def main(req: func.HttpRequest, signalRMessages: func.Out[str]) -> func.HttpResp
         )
     try:
         location = details.get('location')
-        temprature = details.get('temprature')
+        temperature = details.get('temperature')
         humidity = details.get('humidity')
     except:
         return func.HttpResponse(
-             "details must contain location, temprature and humidity",
+             "details must contain location, temperature and humidity",
              status_code=400
         )
     try:
-        temprature = float(temprature)
+        temperature = float(temperature)
         humidity = float(humidity)
     except:
         return func.HttpResponse(
-             "temprature and humidity must be floats",
+             f"temperature and humidity must be floats, but temp is {type(temperature)} (with value {temperature}) and humidity is {type(humidity)} (with value {humidity}). The request body is {req_body}, and parsed as {details}",  
              status_code=400
         )
     
