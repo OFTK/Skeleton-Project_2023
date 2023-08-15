@@ -1,18 +1,19 @@
-# where is my tinoki 
+# where is my tinoki
+
 an IoT system to monitor the whereabouts of your tinokis, and see if their caretaker leaves them for too long.
 
 in ech folder, there is a README file for that part of the project.
 
-# Mobile App
+## Mobile App
 
-### General Information:
-
-
+### General Information
 
 This app collects data continously from surrounding BabyTags, it collects the data using BLE (Bluetooth Low Energy) and uploads it to the serverless DB (if the device is not connected to Wifi).
 Also, it may connect a BabyTag to Wifi, see instructions below on how to do so.
 
-### Ofek: TODO
+### Authentication
+
+Using Microsoft MobileServiceClient, the app makes the user authenticate with its azure AD.
 
 ### Connection with the IoT Device
 
@@ -20,13 +21,13 @@ Establishing a Wi-Fi connection for a BabyTag involves transmitting Wi-Fi creden
 After credentials are given, in order to connect a BabyTag, you need to scan it's QR Code, do so by navigating to the dedicated page using the "Scan for QR" button.
 If the BabyTag is recognised as a new one by the system, you would be asked to register a new name for this new baby. The password is transmitted securely (Using AES128 symmetric encryption) to the BabyTag.
 
-# IoT Device
+## IoT Device
 
-### General Information:
+### IoT Device - General Information
 
 The IoT Device serves as a versatile BLE server while also offering connectivity through Wi-Fi to the internet. This device is equipped with a BLE service which is assigned the unique identifier (UUID) of each baby. This UUID is acquired by scanning the dedicated QR Code accompanying the babytag. The service is openly accessible for connection.
 
-#### BLE Data Points:
+#### BLE Data Points
 
 The IoT Device broadcasts two essential "baby status" parameters via BLE: temperature and humidity. Each of these parameters is encapsulated within a BLE characteristic, both sharing a universal UUID across all BabyTag devices:
 
@@ -35,7 +36,7 @@ The IoT Device broadcasts two essential "baby status" parameters via BLE: temper
 
 Data readings are sourced from a BME280 sensor, with the device initiating sampling with every BLE read event.
 
-### Wi-Fi Connectivity:
+### Wi-Fi Connectivity
 
 Establishing a Wi-Fi connection for the BabyTag involves transmitting Wi-Fi credentials (SSID, Password) via the mobile app. These credentials are relayed through BLE characteristics, each distinguished by a unique UUID:
 
@@ -44,7 +45,7 @@ Establishing a Wi-Fi connection for the BabyTag involves transmitting Wi-Fi cred
 
 The SSID is conveyed as plaintext, while the password is securely transferred in ciphertext. Refer to the mobile app's README.md for comprehensive instructions on how to transmit those.
 
-#### Security Measures:
+#### Security Measures
 
 To ensure the privacy and integrity of sensitive data exchanged between the BabyTag and the mobile app, security measures are implemented. Sensitive data, (in the current version consists of only the Wi-Fi password) undergoes AES128 encryption. For encryption purposes, the device generates a 16-byte true random string referred to as "sync," accessible via a dedicated BLE characteristic:
 
@@ -56,10 +57,9 @@ While connected to Wi-Fi, the BabyTag ensures the secure transmission of all "ba
 
 For more details and comprehensive usage guidelines, please refer to the mobile app's documentation.
 
+## Serverless and DB
 
-# Serverless and DB
-
-## Storage account
+### Storage account
 
 ### general information
 
@@ -78,7 +78,8 @@ The URL to the table endpoint is: <https://skeletonwebjobsstorage.table.core.win
 
 There is also a timeStamp, its the creation time of the DB entity, and i couldn't manage to modify it.
 
-###second storage tabale- "families"
+### second storage tabale - "families"
+
 this table stores all family names of the system users.
 the paritiom key is identical for all families for convinience of accesing the table while the row key is a unique family name.
 
@@ -96,7 +97,9 @@ current_time_in_iso_format = datetime.now().isoformat() # isoformat() returns a 
 
 ### function API
 
-for every function there is a simple python client in the test folder
+For every function there is a simple python client in the test folder.
+
+In all of the functions marked as secure the familyname is taken from the "x-ms-token-aad-id-token" header, which is a JWT provided by the identity provider (in the JWT there is a encoded json that has the name nicely laied out).
 
 #### addbaby
 
@@ -201,7 +204,6 @@ no header parameter needed.
 response is a json with the following structure:
 {family_names: (5) ['cohen', 'family', 'kaplan', 'levi', 'toledo']}
 
-
 #### serveralert
 
 timer trigger - triggers every other minute (" 0 * /2 * * * * ").
@@ -226,13 +228,11 @@ samples family and sends signalR message to a hub named "babyalert" with argumen
 
 http trigger. gets json from push request body, and sends it as the argument field in a signalr message to a hub names "babyalert".
 
-
-
-# Web App Overview
+## Web App Overview
 
 The web app has been created using the React framework with the Axios library.This web app is multi-page.
 
-## Pages:
+### Pages
 
 *1. Admin*
 The Admin page stands as a control center, for system managers. administrators gain access to a  oversee all registered families. This includes the ability to monitor family activities, receive real-time SignalR alerts, and deleting and adding babies with valid UUIDs.
@@ -246,12 +246,12 @@ A page that presents the project and our vision..
 *4. Sign Up*
 A page in which visitors of the web app can leave contact information and sign up to our service.
 
-
-# Azure services:
+## Azure services
 
 the web app acceses the Azure storage tables to apdate and extract information.
 it uses Azure function apps and signalR.
 we also use Microsoft Azure authenticatiom to allow different premitions for different people.
 
-# security :
-the function apps are protected with function app API keys. 
+## Security
+
+The function apps for administration are protected with function app API keys.
