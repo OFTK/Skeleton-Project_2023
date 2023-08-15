@@ -1,28 +1,35 @@
-# IoT Hub and Device SDK
-In this exercise, we are going to learn about IoT Hub, the device SDK and how to send data from the device to the cloud when the device user is pressing a button.
+# IoT Device - README
 
-## Open your own IoT Hub, register the device and run the sample
-Follow these instructions to open your own IoT Hub in the Azure Portal, register a new device and run the sample code:
-https://docs.microsoft.com/en-us/azure/iot-hub/quickstart-send-telemetry-c
+### General Information:
 
-This will allow you to better understand the use of the device SDK and see a real working sample.
+The IoT Device serves as a versatile BLE server while also offering connectivity through Wi-Fi to the internet. This device is equipped with a BLE service which is assigned the unique identifier (UUID) of each baby. This UUID is acquired by scanning the dedicated QR Code accompanying the babytag. The service is openly accessible for connection.
 
-For Arduino devices, there is a port of the C SDK (with included samples). You can find it here:
-https://github.com/Azure/azure-iot-arduino
+#### BLE Data Points:
 
-## Device logic
-Attach a button to your IoT device. The device should send a message to the IoT Hub every time the user is pressing the button.
-You can find a sample of a working button loop in this GitHub repo: https://github.com/flaviomauro/adafruit-feather-huzzah-led-button
-(Thanks Arthur for finding the new link)
+The IoT Device broadcasts two essential "baby status" parameters via BLE: temperature and humidity. Each of these parameters is encapsulated within a BLE characteristic, both sharing a universal UUID across all BabyTag devices:
 
-Combine the Arduino SDK and the code above to send a message to the IoT Hub each time the button is pressed.
+- Temperature UUID: "f96c20eb-05c7-4c31-803b-03428eae9aa2"
+- Humidity UUID: "2d4fa781-cf1c-4ea1-9427-14951f794d80"
 
-## Simulate a device in a C# console app
-If you don't have access to a device, you can simulate it.
-Below, you can find the code that simulates a device in a simple C# console application. It uses the C# SDK to communicate with Azure IoT Hub and send messages.  
-https://github.com/AlexPshul/serverless-iot/blob/master/SimulatedDevice/SimulatedDevice/Program.cs
+Data readings are sourced from a BME280 sensor, with the device initiating sampling with every BLE read event.
 
-## Troubleshoot
-If you run into a problem with connections, you have two options:
-1. Update the WiFi firmware. See this discussion on GitHub: https://github.com/arduino/Arduino/pull/6069
-2. Use the HTTP sample: https://github.com/Azure-Samples/iot-hub-c-huzzah-getstartedkit
+### Wi-Fi Connectivity:
+
+Establishing a Wi-Fi connection for the BabyTag involves transmitting Wi-Fi credentials (SSID, Password) via the mobile app. These credentials are relayed through BLE characteristics, each distinguished by a unique UUID:
+
+- SSID UUID: "28919cc6-36d5-11ee-be56-0242ac120002"
+- Password UUID: "02350feb-8302-4ff7-8f04-9e07f69d73df"
+
+The SSID is conveyed as plaintext, while the password is securely transferred in ciphertext. Refer to the mobile app's README.md for comprehensive instructions on how to transmit those.
+
+#### Security Measures:
+
+To ensure the privacy and integrity of sensitive data exchanged between the BabyTag and the mobile app, security measures are implemented. Sensitive data, (in the current version consists of only the Wi-Fi password) undergoes AES128 encryption. For encryption purposes, the device generates a 16-byte true random string referred to as "sync," accessible via a dedicated BLE characteristic:
+
+- Sync UUID: "3b4fa77b-bb0b-4b12-8ee6-913382a4f2a0"
+
+Additionally, a symmetric key, essential for AES128 encryption, is shared between the IoT device and the mobile app. The mobile app retrieves this key by scanning the QR Code associated with the device.
+
+While connected to Wi-Fi, the BabyTag ensures the secure transmission of all "baby status" parameters through HTTPS.
+
+For more details and comprehensive usage guidelines, please refer to the mobile app's documentation.
