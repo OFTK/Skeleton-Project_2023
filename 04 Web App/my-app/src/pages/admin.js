@@ -68,7 +68,11 @@ function Admin() {
 
   async function fetchFamilyNames() {
     try {
-      const response = await axios.get('https://ilovemybaby.azurewebsites.net/api/getallfamilies');
+      const response = await axios.get('https://ilovemybaby.azurewebsites.net/api/getallfamilies', {
+        headers: {
+          'x-functions-key': 'Y1j6iIWnQwh1_YY-JETsbZ00HSIa9GCNcXfNAOUeZygZAzFuVD0Tmw=='
+        }
+      });
       setFamilyNames(response.data);
       console.log('Response:', response.data);
     } catch (error) {
@@ -78,7 +82,11 @@ function Admin() {
 
   async function fetchFamilyDetails(familyName) {
     try {
-      const response = await axios.get(`https://ilovemybaby.azurewebsites.net/api/getfamilystatus?family=${familyName}`);
+      const response = await axios.get(`https://ilovemybaby.azurewebsites.net/api/getfamilystatus?family=${familyName}`, {
+        headers: {
+          'x-functions-key': 'Y1j6iIWnQwh1_YY-JETsbZ00HSIa9GCNcXfNAOUeZygZAzFuVD0Tmw=='
+        }
+      });
       setFamilyStatus(response.data.status);
     } catch (error) {
       console.error('Error fetching family details:', error);
@@ -94,7 +102,11 @@ function Admin() {
       };
 
       axios
-        .post('https://ilovemybaby.azurewebsites.net/api/addBaby', babyData)
+        .post('https://ilovemybaby.azurewebsites.net/api/addBaby', babyData, {
+          headers: {
+            'x-functions-key': 'Y1j6iIWnQwh1_YY-JETsbZ00HSIa9GCNcXfNAOUeZygZAzFuVD0Tmw=='
+          }
+        })
         .then(() => {
           fetchFamilyDetails(selectedFamily);
           setNewBabyId('');
@@ -112,6 +124,10 @@ function Admin() {
         .post('https://ilovemybaby.azurewebsites.net/api/deletebaby', {
           family: selectedFamily,
           babyid: babyId,
+        }, {
+          headers: {
+            'x-functions-key': 'Y1j6iIWnQwh1_YY-JETsbZ00HSIa9GCNcXfNAOUeZygZAzFuVD0Tmw=='
+          }
         })
         .then(() => {
           fetchFamilyDetails(selectedFamily);

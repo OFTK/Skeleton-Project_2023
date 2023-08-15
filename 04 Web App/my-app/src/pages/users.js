@@ -43,11 +43,15 @@ const User = () => {
 
   useEffect(() => {
     fetchFamilyStatus();
-  }, );
+  }, []);
 
   const fetchFamilyStatus = () => {
     axios
-      .get(`https://ilovemybaby.azurewebsites.net/api/getfamilystatus?family=${familyName}`)
+      .get(`https://ilovemybaby.azurewebsites.net/api/getfamilystatus?family=${familyName}`, {
+        headers: {
+          'x-functions-key': 'Y1j6iIWnQwh1_YY-JETsbZ00HSIa9GCNcXfNAOUeZygZAzFuVD0Tmw=='
+        }
+      })
       .then(response => {
         setFamilyStatus(response.data.status);
       })
@@ -65,7 +69,11 @@ const User = () => {
       };
 
       axios
-        .post('https://ilovemybaby.azurewebsites.net/api/addbaby', babyData)
+        .post('https://ilovemybaby.azurewebsites.net/api/addbaby', babyData, {
+          headers: {
+            'x-functions-key': '15892e4a-ce78-4da1-88f3-aa2527112cb4'
+          }
+        })
         .then(() => {
           fetchFamilyStatus();
           setNewBabyId('');
