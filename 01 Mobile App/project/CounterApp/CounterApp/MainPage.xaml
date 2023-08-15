@@ -23,13 +23,14 @@
         <ListView x:Name="FamilyStatusListView"
                   ItemsSource="{Binding LocalFamilyDetails.details}"
                   SeparatorVisibility="None" 
-                  ItemSelected="OnItemSelected">
+                  ItemSelected="OnItemSelected"
+                  RowHeight="60">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
-                        <StackLayout Padding="10" BackgroundColor="White" Spacing="5" Orientation="Vertical">
+                        <StackLayout Padding="0" BackgroundColor="White" Spacing="5" Orientation="Vertical" HeightRequest="300">
                             <Label Text="{Binding babyname}" TextColor="Black" FontAttributes="Bold"/>
-                            <Label Text="{Binding displaystring}" TextColor="Black"/>
+                            <Label Text="{Binding displaystring}" TextColor="DarkSlateGray"/>
                         </StackLayout>
                     </ViewCell>
                 </DataTemplate>

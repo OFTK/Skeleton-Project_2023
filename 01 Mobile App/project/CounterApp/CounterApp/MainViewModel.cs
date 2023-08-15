@@ -182,42 +182,46 @@ namespace CounterApp
             Debug.WriteLine(connection.ConnectionId);
 
             
-            FamilyDetails updatedFamilyDetails = new FamilyDetails();
-            updatedFamilyDetails.details = new List<BabyDetails>();
-            // parse response
-            JObject json = JObject.Parse(response_string);
-            updatedFamilyDetails.family = (string)json["family"];
-            JArray items = (JArray)json["status"];
-            // put each field in item into a new BabyDetails object
-            foreach (JObject item in items)
+            if (response_string != null || response_string != "")
             {
-                BabyDetails newbabydetails = new BabyDetails();
-                newbabydetails.babyname = (string)item["babyname"];
-                newbabydetails.babyid = (string)item["babyid"];
-                DateTime? lastupdate = (DateTime?)item["lastupdate"];
-                // TODO: convert from east europe time to local time
-                newbabydetails.lastupdate = lastupdate;
-                newbabydetails.displaystring = "Was last seen at: " + (string)item["lastupdate"];
-                newbabydetails.baby_is_ok = true;
-                // if babydetails is null, then put empty string in location, temperature and humidity 
-                try
+                FamilyDetails updatedFamilyDetails = new FamilyDetails();
+                updatedFamilyDetails.details = new List<BabyDetails>();
+                // parse response
+                JObject json = JObject.Parse(response_string);
+                updatedFamilyDetails.family = (string)json["family"];
+                JArray items = (JArray)json["status"];
+                // put each field in item into a new BabyDetails object
+                foreach (JObject item in items)
                 {
-                    JObject babydetails = JObject.Parse((string)item["details"]);
-                    newbabydetails.location = (string)babydetails["location"];
-                    newbabydetails.temperature = (float?)babydetails["temperature"];
-                    newbabydetails.humidity = (float?)babydetails["humidity"];
+                    BabyDetails newbabydetails = new BabyDetails();
+                    newbabydetails.babyname = (string)item["babyname"];
+                    newbabydetails.babyid = (string)item["babyid"];
+                    DateTime? lastupdate = (DateTime?)item["lastupdate"];
+                    // TODO: convert from east europe time to local time
+                    newbabydetails.lastupdate = lastupdate;
+                    newbabydetails.displaystring = "Was last seen at: " + (string)item["lastupdate"];
+                    newbabydetails.baby_is_ok = true;
+                    // if babydetails is null, then put empty string in location, temperature and humidity 
+                    try
+                    {
+                        JObject babydetails = JObject.Parse((string)item["details"]);
+                        newbabydetails.location = (string)babydetails["location"];
+                        newbabydetails.temperature = (float?)babydetails["temperature"];
+                        newbabydetails.humidity = (float?)babydetails["humidity"];
+                    }
+                    catch
+                    {
+                        newbabydetails.location = "";
+                        newbabydetails.temperature = null;
+                        newbabydetails.humidity = null;
+                    }
+                    DisplayMessage = "Got status for " + newbabydetails.babyname;
+                    updatedFamilyDetails.details.Add(newbabydetails);
                 }
-                catch 
-                {
-                    newbabydetails.location = "";
-                    newbabydetails.temperature = null;
-                    newbabydetails.humidity = null;
-                }
-                DisplayMessage = "Got status for " + newbabydetails.babyname;
-                updatedFamilyDetails.details.Add(newbabydetails);
+                // update the display
+                LocalFamilyDetails = updatedFamilyDetails;
+
             }
-            // update the display
-            LocalFamilyDetails = updatedFamilyDetails;
         }
 
         private void GetFamilyDetailsThread()

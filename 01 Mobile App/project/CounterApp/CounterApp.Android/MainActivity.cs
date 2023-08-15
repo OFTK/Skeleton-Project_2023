@@ -26,7 +26,8 @@ namespace CounterApp.Droid
             ZXing.Net.Mobile.Forms.Android.Platform.Init();
             LoadApplication(new App());
 
-            MainThread.BeginInvokeOnMainThread(async () => await Permissions.RequestAsync<BLEPermission>());
+            var task = Task.Run(async () => await Permissions.RequestAsync<BLEPermission>());
+            task.Wait();
 
             // Set status bar color
             Window.SetStatusBarColor(Android.Graphics.Color.ParseColor("#5F9EA0")); // Pastel Turquoise
