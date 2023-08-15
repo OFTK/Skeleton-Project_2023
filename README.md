@@ -252,3 +252,6 @@ A page in which visitors of the web app can leave contact information and sign u
 the web app acceses the Azure storage tables to apdate and extract information.
 it uses Azure function apps and signalR.
 we also use Microsoft Azure authenticatiom to allow different premitions for different people.
+
+# security :
+the function apps are protected with function app API keys. 

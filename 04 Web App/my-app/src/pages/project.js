@@ -141,6 +141,7 @@ const Project = () => {
       <ProjectText>
         <StrongText>Azure Services:</StrongText>
         The web app accesses the Azure storage tables to update and extract information. It uses Azure Function Apps and SignalR. We also use Microsoft Azure authentication to allow different permissions for different people.
+      <ProjectText>the security of the web app is based on function app API keys </ProjectText>
       </ProjectText>
     </ProjectContainer>
   );
