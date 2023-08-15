@@ -1,4 +1,4 @@
-# IoT Device - README
+# IoT Device
 
 ### General Information:
 

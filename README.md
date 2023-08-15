@@ -21,6 +21,15 @@ In order to build and run the app in Visual Studio 2019
 ## [IoT Device](https://github.com/OFTK/Skeleton-Project_2023/tree/master/02%20IoT%20Device)
 Serves as a BLE server while can be also connected to the server using Wi-Fi. It samples the data using a BME280 sensor, then posts it. More details in the README inside the [IoT Device]([https://github.com/OFTK/Skeleton-Project_2023/tree/master/03%20Serverless%20and%20DB](https://github.com/OFTK/Skeleton-Project_2023/tree/master/02%20IoT%20Device)) folder.
 
+### Setup
+In order to compile the module in Arduino Studio:
+* Setup Arduino Studio for [working with Sparkfun ESP32 Thing Plus](https://learn.sparkfun.com/tutorials/esp32-thing-plus-hookup-guide/software-setup)
+* Install the required packages, from library manager: 
+- AESLib
+- SparkFun BME280
+- ESP32 BLE Arduino
+- HTTPClient
+
 ## [Serverless and DB](https://github.com/OFTK/Skeleton-Project_2023/tree/master/03%20Serverless%20and%20DB)
 More details in the README inside the [Serverless and DB](https://github.com/OFTK/Skeleton-Project_2023/tree/master/03%20Serverless%20and%20DB) folder.
 

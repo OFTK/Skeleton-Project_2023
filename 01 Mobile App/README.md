@@ -1,34 +1,16 @@
-# Xamarin App
-In this exercise, we are going to create a basic counter app, which will increase a counter on the screen each time the user presses a button.
+# Mobile App
 
+### General Information:
 
-## Install mobile development tools
-To be able to develop mobile applications using Xamarin, you first need to install the proper tools via the Visual Studio Installer.
+Ofek: TODO
 
-https://docs.microsoft.com/en-us/xamarin/get-started/installation/windows
+This app collects data continously from surrounding BabyTags, it collects the data using BLE (Bluetooth Low Energy) and uploads it to the serverless DB (if the device is not connected to Wifi).
+Also, it may connect a BabyTag to Wifi, see instructions below on how to do so.
 
-Also, you need to install .NET SDK from the following link:
-[link to .NET SDK 5.0, for Visual Studio 2019](https://download.visualstudio.microsoft.com/download/pr/14ccbee3-e812-4068-af47-1631444310d1/3b8da657b99d28f1ae754294c9a8f426/dotnet-sdk-5.0.408-win-x64.exe)
+### Ofek: TODO
 
+### Connection with the IoT Device
 
-## Go though the interactive C# tutorial
-To develop in Xamarin, you’ll need to learn C#. Refresh your memory using the following online interactive tutorial.
-
-https://docs.microsoft.com/en-us/dotnet/csharp/tutorials/intro-to-csharp/
-
-## Create the counter app
-Create a new app and call it **CounterApp**.
-The idea of the app is to allow the user to increment a number on the screen using a button that is attached to it.
-
-Design each element on the screen according to the screen shot image below.
-
-Don’t forget to use the MVVM pattern: https://docs.microsoft.com/en-us/xamarin/xamarin-forms/enterprise-application-patterns/mvvm
-* Create a view model for your main view
-* Bind a command to each of the buttons and pass the counter id as a parameter
-* Bind the counter number to the appropriate property on the View Model
-* Make sure the app works on your real mobile phone and not only on the emulator
-
-## **BONUS**
-* Achieve the two counters (and buttons) using a list of models in your view model and a [DataTemplate](https://docs.microsoft.com/en-us/xamarin/xamarin-forms/app-fundamentals/templates/data-templates/creating).
-
-![screen shot](./ScreenShot.PNG)
+Establishing a Wi-Fi connection for a BabyTag involves transmitting Wi-Fi credentials (SSID, Password) securely via the mobile app. These credentials needs to be given manually, to do so, navigate to the dedicated page using the "Change BabyTag Wifi" button.
+After credentials are given, in order to connect a BabyTag, you need to scan it's QR Code, do so by navigating to the dedicated page using the "Scan for QR" button.
+If the BabyTag is recognised as a new one by the system, you would be asked to register a new name for this new baby. The password is transmitted securely (Using AES128 symmetric encryption) to the BabyTag.

@@ -26,8 +26,7 @@ namespace CounterApp.Droid
             ZXing.Net.Mobile.Forms.Android.Platform.Init();
             LoadApplication(new App());
 
-            var task = Task.Run(async () => await Permissions.RequestAsync<BLEPermission>());
-            task.Wait();
+            MainThread.BeginInvokeOnMainThread(async () => await Permissions.RequestAsync<BLEPermission>());
         }
         // protected override async void OnCreate(Bundle savedInstanceState)
         // {
