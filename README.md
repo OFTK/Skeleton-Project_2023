@@ -19,7 +19,7 @@ In order to build and run the app in Visual Studio 2019
 )
 
 ## [IoT Device](https://github.com/OFTK/Skeleton-Project_2023/tree/master/02%20IoT%20Device)
-In this exercise, we are going to learn about IoT Hub, the device SDK and how to send data from the device to the cloud when the device user is pressing a button.
+Serves as a BLE server while can be also connected to the server using Wi-Fi. It samples the data using a BME280 sensor, then posts it. More details in the README inside the [IoT Device]([https://github.com/OFTK/Skeleton-Project_2023/tree/master/03%20Serverless%20and%20DB](https://github.com/OFTK/Skeleton-Project_2023/tree/master/02%20IoT%20Device)) folder.
 
 ## [Serverless and DB](https://github.com/OFTK/Skeleton-Project_2023/tree/master/03%20Serverless%20and%20DB)
 More details in the README inside the [Serverless and DB](https://github.com/OFTK/Skeleton-Project_2023/tree/master/03%20Serverless%20and%20DB) folder.
