@@ -182,7 +182,7 @@ namespace CounterApp
             Debug.WriteLine(connection.ConnectionId);
 
             
-            if (response_string != null || response_string != "")
+            try
             {
                 FamilyDetails updatedFamilyDetails = new FamilyDetails();
                 updatedFamilyDetails.details = new List<BabyDetails>();
@@ -220,8 +220,8 @@ namespace CounterApp
                 }
                 // update the display
                 LocalFamilyDetails = updatedFamilyDetails;
-
             }
+            catch {}
         }
 
         private void GetFamilyDetailsThread()
@@ -287,11 +287,11 @@ namespace CounterApp
                     BabyStatus result = scanner.BLEScan(LocalFamilyDetails.details[i].babyid, aes_key, dev_connect_to_ssid, dev_connect_to_pass).Result;
 
                     // code to test server updating in emulator (without BLE)
-                    BabyStatus myresult = new BabyStatus();
-                    myresult._BabyHumd = (float)50.01;
-                    myresult._BabyTemp= (float)50.01;
-                    myresult._BabyLastSeenTime = DateTime.Now;
-                    UpdateServer(myresult, LocalFamilyDetails.details[i]);
+                    // BabyStatus myresult = new BabyStatus();
+                    // myresult._BabyHumd = (float)50.01;
+                    // myresult._BabyTemp= (float)50.01;
+                    // myresult._BabyLastSeenTime = DateTime.Now;
+                    // UpdateServer(myresult, LocalFamilyDetails.details[i]);
 
                     if (result != null && result._BabyTemp != null)
                     {
