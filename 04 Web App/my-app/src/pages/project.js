@@ -50,7 +50,7 @@ const Project = () => {
       <ProjectText>
          Where is My Tinoki
         An IoT system to monitor the whereabouts of your tinokis and see if their caretaker leaves them for too long.
-        In each folder, there is a README file for that part of the project.
+  
       </ProjectText>
 
       <SubHeader>Mobile App</SubHeader>
@@ -98,7 +98,8 @@ const Project = () => {
       </ProjectText>
       <ProjectText>
         <StrongText>Storage Design:</StrongText>
-        first tables family name as partition key and baby name as row key. 
+        <StrongText>First Storage Table - "project":</StrongText>
+        family name as partition key and baby name as row key. 
         the rest of the columns holds babyid last update latitude and longitude.
 
       </ProjectText>
@@ -128,10 +129,13 @@ const Project = () => {
           <StrongText>Admin:</StrongText> The Admin page stands as a control center for system managers. Administrators gain access to oversee all registered families. This includes the ability to monitor family activities, receive real-time SignalR alerts, and delete and add babies with valid UUIDs.
         </ListItem>
         <ListItem>
-          <StrongText>Map:</StrongText> The Map page offers a geographic display of BabyTag locations. It shows the live location of all babies connected to the system and presents their most recent "baby status" data, namely temperature and humidity levels. The map is implemented using the Google Maps API.
+          <StrongText>User:</StrongText> The User page is designed for individual families within the system. Users are granted selective access, allowing them to view only their own family's information. In addition, users can add new babies with valid UUID. The User page also show pop up updates through SignalR, keeping users informed about the latest updates about their family's babies.
         </ListItem>
         <ListItem>
-          <StrongText>Family:</StrongText> The Family page provides a detailed overview of a particular family's registered babies. It displays each baby's current status (temperature and humidity), along with a live feed of their activities. Parents can view their babies' historical activity and receive alerts if any concerning activity patterns are detected.
+          <StrongText>About:</StrongText> A page that presents the project and our vision.
+        </ListItem>
+        <ListItem>
+          <StrongText>sign-Up:</StrongText> A page in which visitors of the web app can leave contact information and sign up to our service.
         </ListItem>
       </SubList>
       <ProjectText>
