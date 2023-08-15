@@ -5,33 +5,56 @@
              x:Class="CounterApp.MainPage"
              Title="I LOVE MY BABY">
 
-    <StackLayout>
-        <Label Text="I LOVE MY BABY" HorizontalOptions="Center" FontSize="Title" FontAttributes="Bold" Margin="20"/>
+    <ContentPage.Resources>
+        <Style TargetType="Label">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="TextColor" Value="Black"/>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="TextColor" Value="White"/>
+            <Setter Property="BackgroundColor" Value="#007A8E"/>
+            <!-- Pastel Turquoise -->
+        </Style>
+    </ContentPage.Resources>
+
+    <StackLayout Padding="20">
+        <Label Text="Family Status" HorizontalOptions="Center" FontSize="Title" FontAttributes="Bold" Margin="0,0,0,20"/>
 
         <ListView x:Name="FamilyStatusListView"
                   ItemsSource="{Binding LocalFamilyDetails.details}"
-                  ItemTapped="OnItemTapped"
-                  PropertyChanged="FamilyStatusListView_PropertyChanged"
-                  SeparatorColor="DarkGray">
+                  SeparatorVisibility="None" 
+                  ItemSelected="OnItemSelected">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                        <TextCell Text="{Binding babyname, StringFormat='{0}'}" TextColor="DarkSlateGray" Detail="{Binding displaystring}"/>
+                    <ViewCell>
+                        <StackLayout Padding="10" BackgroundColor="White" Spacing="5" Orientation="Vertical">
+                            <Label Text="{Binding babyname}" TextColor="Black" FontAttributes="Bold"/>
+                            <Label Text="{Binding displaystring}" TextColor="DarkSlateGray"/>
+                        </StackLayout>
+                    </ViewCell>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
 
-        <Button Text="Start Monitoring" Command="{Binding StartViewModelCommand}" TextColor="White" BackgroundColor="DarkSlateBlue" IsVisible="{Binding ViewModelNotStarted}"/>
-        <Label Text="{Binding DisplayMessage, StringFormat='{0}'}" TextColor="Black" FontSize="Small"/>
-        <Label Text="{Binding DisplayMessage2, StringFormat='{0}'}" TextColor="Black" FontSize="Small"/>
-        <Button Text="Change BabyTag Wifi"
-                x:Name="WifiBut"
-                Clicked="WifiBut_Clicked"
-            />
-        <Button Text="Scan for QR"
-                x:Name="QRBut"
-                Clicked="QRBut_Clicked"
-            />
+        <!-- <ListView x:Name="FamilyStatusListView"
+                  ItemsSource="{Binding LocalFamilyDetails.details}"
+                  ItemSelected="OnItemSelected"
+                  SeparatorColor="DarkGray">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextCell Text="{Binding babyname}" TextColor="DarkSlateGray" Detail="{Binding displaystring}"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView> -->
 
+        <StackLayout IsVisible="{Binding ViewModelNotStarted}" Spacing="10">
+            <Button Text="Start Monitoring" Command="{Binding StartViewModelCommand}"/>
+            <Label Text="{Binding DisplayMessage}" FontSize="Small"/>
+            <Label Text="{Binding DisplayMessage2}" FontSize="Small"/>
+        </StackLayout>
+
+        <Button Text="Change BabyTag Wifi" Clicked="WifiBut_Clicked"/>
+        <Button Text="Scan for QR" Clicked="QRBut_Clicked"/>
     </StackLayout>
 
 </ContentPage>

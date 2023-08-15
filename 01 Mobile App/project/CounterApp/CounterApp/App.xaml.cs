@@ -11,11 +11,11 @@ namespace CounterApp
         public App()
         {
             InitializeComponent();
-            var navigationPage = new Xamarin.Forms.NavigationPage(new MainPage());
-
-            navigationPage.BarBackgroundColor = (Color)Resources["coolBlue"];
-            navigationPage.BarTextColor = Color.White;
-
+            var navigationPage = new NavigationPage(new MainPage())
+            {
+                BarBackgroundColor = Color.FromHex("#5F9EA0"), // Pastel Turquoise
+                BarTextColor = Color.White
+            };
             MainPage = navigationPage;
             // MainPage = new MainPage();
         }
