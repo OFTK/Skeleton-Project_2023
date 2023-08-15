@@ -15,7 +15,7 @@ def send_addbaby_request(family: str, babyname: str, babyid: str, url: str):
 def main():
     localurl_base = "http://localhost:7071"
     remoteurl_base = "https://ilovemybaby.azurewebsites.net"
-    send_addbaby_request("tikotzky", "ofek", "b0ff7653-3a3a-48c2-8ba7-23770091678e", remoteurl_base+"/api/addbaby")
+    send_addbaby_request("tikotzky", "ronie", "40bb5811-587c-49da-854c-dfb55fac3426", remoteurl_base+"/api/addbaby")
 
 if __name__ == '__main__':
     main()

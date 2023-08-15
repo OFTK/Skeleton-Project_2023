@@ -92,29 +92,34 @@ def main(req: func.HttpRequest, signalRMessages: func.Out[str]) -> func.HttpResp
                 family = entity['PartitionKey']
                 logging.warning(f"babyname is {babyname} from family {family}")
 
+                # udpate time and location
+                update_time = datetime.now().isoformat()
+                logging.info(f"update time is set to {update_time}")
+                entity['lastupdate'] = update_time
+                
+                details_dictionary = {}
+                try:
+                    details_from_db = json.loads(entity['details'])
+                    details_dictionary['location'] = details_from_db['location']
+                except:
+                    details_dictionary['location'] = "unknown"
+                details_dictionary['temprature'] = temprature
+                details_dictionary['humidity'] = humidity
+                entity['details'] = json.dumps(details_dictionary)
+                table.update_entity(entity=entity, mode='replace')
+                
+                # return success
+                return func.HttpResponse(
+                    f"successfuly updated {babyname}'s status, in time {update_time}",
+                    status_code=200
+                )
 
-            # udpate time and location
-            update_time = datetime.now().isoformat()
-            logging.info(f"update time is set to {update_time}")
-            entity['lastupdate'] = update_time
-            
-            # update only tempraure and humidity
-            details_dictionary = {}
-            try:
-                details_from_db = json.loads(entity['details'])
-                details_dictionary['location'] = details_from_db['location']
-            except:
-                details_dictionary['location'] = "unknown"
-            details_dictionary['temprature'] = temprature
-            details_dictionary['humidity'] = humidity
-            entity['details'] = json.dumps(details_dictionary)
-            table.update_entity(entity=entity, mode='replace')
-            
             # return success
             return func.HttpResponse(
-                f"successfuly updated {babyname}'s status, in time {update_time}",
+                f"babyid {babyid} not found in the DB",
                 status_code=200
             )
+        
 
     # in case of internal server error
     except Exception as e:

@@ -11,7 +11,7 @@ def send_getfamilystatus_request(family: str, url: str):
 def main():
     localurl_base = "http://localhost:7071"
     remoteurl_base = "https://ilovemybaby.azurewebsites.net"
-    send_getfamilystatus_request("family", f"{remoteurl_base}/api/getfamilystatus")
+    send_getfamilystatus_request("tikotzky", f"{remoteurl_base}/api/getfamilystatus")
 
 if __name__ == '__main__':
     main()
