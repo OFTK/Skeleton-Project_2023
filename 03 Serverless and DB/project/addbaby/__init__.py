@@ -133,9 +133,7 @@ def main(req: func.HttpRequest, signalRMessages: func.Out[str]) -> func.HttpResp
                         f"baby tag {babyid} is an already exists in your account",
                         status_code=400
                     )
-
-        
-            # everything is ok - add baby to database
+                # everything is ok - add baby to database
             new_baby_entity = {
                 u'PartitionKey': u'{}'.format(family),
                 u'RowKey': u'{}'.format(babyname),
