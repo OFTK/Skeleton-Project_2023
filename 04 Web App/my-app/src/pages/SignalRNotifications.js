@@ -27,23 +27,31 @@ const SignalRNotifications = () => {
     }, []);
 
     const showNotification = (message) => {
+        console.log('message:', message);
+        if (!message || !message.alert_list || message.alert_list.length === 0) {
+            return;
+        }
         const alertInfo = message.alert_list[0];
-        const formattedMessage = `alert: babyid: ${alertInfo.babyid}, babyname: ${alertInfo.babyname}, alert reason: ${alertInfo.alertreason}`;
-        toast.info(formattedMessage);
+        if (alertInfo) {
+            const babyname = alertInfo.babyname || 'no baby name';
+            const alertreason = alertInfo.alertreason || 'no alert reason, signalR Notifications';
+            const formattedMessage = `alert: babyname: ${babyname}, alert reason: ${alertreason}`;
+            toast.info(formattedMessage);
+        }
     };
 
     return (
         <div>
             <h2>Received Messages:</h2>
-            <ul>
+            <ul style={{ paddingLeft: 0, listStyle: 'none' }}>
                 {messages.map((message, index) => (
-                    <li key={index}>
-                        alert: babyid: {message.alert_list[0].babyid}, babyname: {message.alert_list[0].babyname}, alert reason: {message.alert_list[0].alertreason}
+                    <li key={index} style={{ textAlign: 'left', marginLeft: '2rem', marginBottom: '0.5rem' }}>
+                        alert- babyname: {message.alert_list[0]?.babyname || 'no baby name'}, 
+                        alert reason: {message.alert_list[0]?.alertreason || 'no alert reason, signalR Notifications'}
                     </li>
                 ))}
             </ul>
-           
-            <ToastContainer /> {/* Container for toast notifications */}
+            <ToastContainer />
         </div>
     );
 };

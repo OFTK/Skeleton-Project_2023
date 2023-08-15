@@ -19,6 +19,10 @@ The URL to the table endpoint is: <https://skeletonwebjobsstorage.table.core.win
 
 There is also a timeStamp, its the creation time of the DB entity, and i couldn't manage to modify it.
 
+###second storage tabale- "families"
+this table stores all family names of the system users.
+the paritiom key is identical for all families for convinience of accesing the table while the row key is a unique family name.
+
 DateTime is datetime of format iso 8601. To create that in python i used:
 
 ```python
@@ -46,6 +50,17 @@ no requirements for the header, by the body needs to contain a json of the follo
     "babyid": "<BABY ID>"
 }
 ```
+
+#### deletebaby
+
+no requirements for the header, by the body needs to contain a json of the following structure:
+
+```json
+{
+    "family": "<FAMILY NAME>",
+    "babyname": "<BABY NAME>",
+    "babyid": "<BABY ID>"
+}
 
 #### udpatebabystatus
 
@@ -117,6 +132,16 @@ response is a json with the following structure:
 ```
 
 The null fields in nitzan's last update is in case the baby was added, but an update was never sent.
+
+#### getallfamilies
+
+GET request
+no header parameter needed.
+ <http://localhost:7071/api/ getallfamilies>
+
+response is a json with the following structure:
+{family_names: (5) ['cohen', 'family', 'kaplan', 'levi', 'toledo']}
+
 
 #### serveralert
 
