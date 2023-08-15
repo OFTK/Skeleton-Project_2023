@@ -4,7 +4,11 @@
              x:Class="CounterApp.App">
     <Application.Resources>
         <ResourceDictionary>
-            <Color x:Key="coolBlue">#1030a5</Color>
+            <Style TargetType="NavigationPage">
+                <Setter Property="BarBackgroundColor" Value="#5F9EA0"/>
+                <!-- Pastel Turquoise -->
+                <Setter Property="BarTextColor" Value="White"/>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

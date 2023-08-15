@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Globalization;
 using Xamarin.Forms;
 using Xamarin.Essentials;
-using Xamarin.CommunityToolkit.UI.Views;
-using Xamarin.CommunityToolkit.Extensions;
 using CounterApp.Services;
-using static CounterApp.MainViewModel;
+using Xamarin.CommunityToolkit.Extensions;
 
 namespace CounterApp
 {
@@ -21,16 +16,11 @@ namespace CounterApp
             BindingContext = ViewModelLocator.MainViewModel;
         }
 
-        protected async override void OnAppearing()
+        protected override async void OnAppearing()
         {
             base.OnAppearing();
 
-            // get premissions
-            if (!await PermissionsGrantedAsync()) // Make sure there is permission to use Bluetooth
-            {
-                await Application.Current.MainPage.DisplayAlert("Permission required", "Application needs location permission", "OK");
-                return;
-            }
+            // Permissions check
 
             var azureService = DependencyService.Get<IAzureService>();
 
@@ -41,7 +31,7 @@ namespace CounterApp
             }
         }
 
-        private async Task<bool> PermissionsGrantedAsync()      // Function to make sure that all the appropriate approvals are in place
+        private async Task<bool> CheckLocationPermissionAsync()
         {
             var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
 
@@ -63,56 +53,36 @@ namespace CounterApp
             Navigation.PushAsync(new QRCodeReader());
         }
 
-        void OnItemTapped(object sender, ItemTappedEventArgs e)
+        private async void OnItemSelected(object sender, SelectedItemChangedEventArgs e)
         {
-            if (e.Item == null) return;
-            MainViewModel.BabyDetails tappedBaby = (MainViewModel.BabyDetails)e.Item;
+            if (e.SelectedItem == null)
+                return;
 
-            // create popup with baby's details
-            var popup = new Popup
+            var tappedBaby = (MainViewModel.BabyDetails)e.SelectedItem;
+
+            var popupContent = new StackLayout
             {
-                Content = new StackLayout{Children =
+                BackgroundColor = Color.White,
+                Padding = new Thickness(20),
+                Children =
                 {
-                    new Label {Style=Device.Styles.TitleStyle, Text = tappedBaby.babyname},
-                    new Label {Style=Device.Styles.BodyStyle, Text = "babytag ID: " + tappedBaby.babyid },
-                    new Label {Style=Device.Styles.BodyStyle, Text = "last update: " + tappedBaby.lastupdate},
-                    new Label {Style=Device.Styles.BodyStyle, Text = "temprature: " + tappedBaby.temperature },
-                    new Label {Style=Device.Styles.BodyStyle, Text = "humidity: " + tappedBaby.humidity},
-                    new Label {Style=Device.Styles.BodyStyle, Text = "location: " + tappedBaby.location},
-                }}
+                    new Label { Style=Device.Styles.TitleStyle, Text = tappedBaby.babyname },
+                    new Label { Style=Device.Styles.BodyStyle, Text = $"babytag ID: {tappedBaby.babyid}" },
+                    new Label { Style=Device.Styles.BodyStyle, Text = $"last update: {tappedBaby.lastupdate}" },
+                    new Label { Style=Device.Styles.BodyStyle, Text = $"temprature: {tappedBaby.temperature}" },
+                    new Label { Style=Device.Styles.BodyStyle, Text = $"humidity: {tappedBaby.humidity}" },
+                    new Label { Style=Device.Styles.BodyStyle, Text = $"location: {tappedBaby.location}" },
+                }
             };
+
+            var popup = new Xamarin.CommunityToolkit.UI.Views.Popup
+            {
+                Content = popupContent
+            };
+
             App.Current.MainPage.Navigation.ShowPopup(popup);
 
-            ((ListView)sender).SelectedItem = null;
-        }
-
-        private void FamilyStatusListView_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            base.OnPropertyChanged();
-
-
-            if (this.BindingContext != null)
-            {
-                MainViewModel.FamilyDetails familyDetails = ((MainViewModel)this.BindingContext).LocalFamilyDetails;
-                bool baby_alert = true;
-                if (familyDetails != null)
-                {
-                    foreach (MainViewModel.BabyDetails baby in familyDetails.details)
-                    {
-                        if (baby.baby_is_ok == false)
-                        {
-                            baby.baby_is_ok = true;
-                            baby_alert = false;
-                        }
-                    }
-
-                    if (baby_alert == false)
-                    {
-                        Application.Current.MainPage.DisplayAlert("Baby Alert", "check out baby details", "OK");
-                    }
-
-                }
-            }
+            FamilyStatusListView.SelectedItem = null;
         }
     }
 }

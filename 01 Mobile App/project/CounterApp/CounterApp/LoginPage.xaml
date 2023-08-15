@@ -2,29 +2,25 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:CounterApp"
-             xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
-             ios:Page.UseSafeArea="true"
              x:Class="CounterApp.LoginPage"
-             Title="I LOVE MY BABY">
+             Title="Login">
 
     <ContentPage.BindingContext>
         <local:LoginViewModel />
     </ContentPage.BindingContext>
 
-    <ContentPage.Content>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+    <ContentPage.Resources>
+        <Style TargetType="Button">
+            <Setter Property="TextColor" Value="White"/>
+            <Setter Property="BackgroundColor" Value="#007A8E"/>
+            <!-- Pastel Turquoise -->
+        </Style>
+    </ContentPage.Resources>
 
-            <Button Margin="20,0"
-                    Grid.Row="1"
-                    Text="Log in"
-                    BackgroundColor="DarkSlateBlue"
-                    Command="{Binding LoginCommand}"
-                    TextColor="White" />
-        </Grid>
-    </ContentPage.Content>
-</ContentPage>  
+    <StackLayout Padding="20" VerticalOptions="CenterAndExpand">
+        <Label Text="Sign in to Azure Active Directory" HorizontalOptions="Center" FontSize="Title" FontAttributes="Bold" Margin="0,0,0,20"/>
+
+        <Button Text="Sign In" Command ="{Binding LoginCommand}"/>
+    </StackLayout>
+
+</ContentPage>

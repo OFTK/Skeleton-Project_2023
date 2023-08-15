@@ -27,6 +27,10 @@ namespace CounterApp.Droid
             LoadApplication(new App());
 
             MainThread.BeginInvokeOnMainThread(async () => await Permissions.RequestAsync<BLEPermission>());
+
+            // Set status bar color
+            Window.SetStatusBarColor(Android.Graphics.Color.ParseColor("#5F9EA0")); // Pastel Turquoise
+
         }
         // protected override async void OnCreate(Bundle savedInstanceState)
         // {
