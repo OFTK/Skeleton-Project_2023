@@ -302,6 +302,8 @@ namespace CounterApp
                         }
                         else
                         {
+                            Debug.WriteLine("sampled baby temp");
+                            UpdateServer(result, LocalFamilyDetails.details[i]);
                             DeviceSSID = scanner.dev_wifi_ssid;
                             Console.WriteLine("Device got wifi with ssid: " + DeviceSSID);
                         }
