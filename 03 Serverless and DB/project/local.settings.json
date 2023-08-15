@@ -11,7 +11,7 @@
     "AzureWebJobs.sendc2dmsg.Disabled": "true",
     "AzureWebJobs.updatecounter.Disabled": "true",
     "AzureWebJobs.getfamilystatus.Disabled": "true",
-    "AzureWebJobs.addbaby.Disabled": "false",
+    "AzureWebJobs.addbaby.Disabled": "true",
     "AzureWebJobs.serveralerttest.Disabled": "true",
     "AzureWebJobs.serveralert.Disabled": "true",
     "AzureWebJobs.updatebabystatus.Disabled": "true",

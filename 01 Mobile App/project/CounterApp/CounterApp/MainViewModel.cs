@@ -259,13 +259,13 @@ namespace CounterApp
             };
 
             // send http request
-            HttpClient PostClient = new HttpClient();
-            HttpResponseMessage resp = PostClient.PostAsync(
-                updateBabyDetailsUrl,
+            // HttpClient PostClient = new HttpClient();
+            // HttpResponseMessage resp = PostClient.PostAsync(
+            //     updateBabyDetailsUrl,
                 // serialize babyupdate
-                new StringContent(
-                    JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json")
-                ).Result;
+            //     new StringContent(
+            //         JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json")
+            //     ).Result;
             var azureService = DependencyService.Get<IAzureService>();
             string response_string = azureService.UpdateBabyDetailsToServer(request).Result;
 
@@ -281,6 +281,13 @@ namespace CounterApp
                 for (int i = 0; i < LocalFamilyDetails.details.Count; i++)
                 {
                     BabyStatus result = scanner.BLEScan(LocalFamilyDetails.details[i].babyid, aes_key, dev_connect_to_ssid, dev_connect_to_pass).Result;
+
+                    // code to test server updating in emulator (without BLE)
+                    // BabyStatus myresult = new BabyStatus();
+                    // myresult._BabyHumd = (float?)50.0;
+                    // myresult._BabyTemp= (float?)50.0;
+                    // myresult._BabyLastSeenTime = DateTime.Now;
+                    // UpdateServer(result, LocalFamilyDetails.details[i]);
 
                     if (result != null && result._BabyTemp != null)
                     {

@@ -96,7 +96,9 @@ namespace CounterApp.Services
                     JsonConvert.SerializeObject(update_request), Encoding.UTF8, "application/json")
                 ).Result;
 
-            return resp.Content.ToString();
+            string response_string = resp.Content?.ReadAsStringAsync().Result;
+
+            return response_string;
         }
 
         public async Task<string> AddBabyToServer(JObject addbabyrequest)
