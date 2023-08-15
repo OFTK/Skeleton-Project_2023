@@ -43,7 +43,7 @@ const User = () => {
 
   useEffect(() => {
     fetchFamilyStatus();
-  }, []);
+  }, );
 
   const fetchFamilyStatus = () => {
     axios

@@ -23,10 +23,6 @@ const AboutText = styled.p`
   margin-bottom: 1rem;
 `;
 
-const AboutList = styled.ul`
-  list-style-type: disc;
-  margin-left: 2rem; /* Add an indentation for the list */
-`;
 
 const About = () => {
   return (
