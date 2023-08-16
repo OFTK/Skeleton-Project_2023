@@ -123,8 +123,8 @@ no requirements for the header, by the body needs to contain a json of the follo
     "babyname": "<BABY NAME>",
     "babyid": "<BABY ID>"
 }
-
-#### udpatebabystatus
+```
+#### updatebabystatus
 
 POST request
 no requirements for the header, by the body needs to contain a json of the following structure:
